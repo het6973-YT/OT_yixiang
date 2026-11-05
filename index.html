@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>職能治療解剖學：固有結締組織互動解構系統 (離線版)</title>
+<style>
+  :root {
+    --bg-dark: #0f172a;
+    --panel-bg: #1e293b;
+    --card-bg: #334155;
+    --accent: #38bdf8;
+    --accent-hover: #0284c7;
+    --ot-highlight: #f59e0b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: #475569;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; }
+  
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--panel-bg);
+    border-radius: 12px;
+    border-left: 6px solid var(--accent);
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  header h1 { font-size: 1.35rem; color: #fff; display: flex; align-items: center; gap: 10px; }
+  header .badge { background: var(--ot-highlight); color: #000; font-size: 0.78rem; font-weight: bold; padding: 3px 8px; border-radius: 6px; }
+  header p { font-size: 0.88rem; color: var(--text-muted); margin-top: 4px; }
+
+  /* 頂部組織分類切換列 */
+  .mode-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: var(--panel-bg);
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .mode-bar-title {
+    width: 100%;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+
+  .btn {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .btn:hover { background: #475569; }
+  .btn.active {
+    background: var(--accent);
+    color: #0f172a;
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  }
+
+  .btn-quiz {
+    margin-left: auto;
+    background: #10b981;
+    color: #052e16;
+    border-color: #10b981;
+  }
+  .btn-quiz.active {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+  }
+
+  /* 主內容區：左畫布、右解說 */
+  .main-container {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 16px;
+    flex: 1;
+  }
+
+  @media (max-width: 960px) {
+    .main-container { grid-template-columns: 1fr; }
+  }
+
+  .canvas-panel {
+    background: var(--panel-bg);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+
+  .layer-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .layer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    background: var(--card-bg);
+    padding: 5px 10px;
+    border-radius: 6px;
+    user-select: none;
+  }
+
+  .layer-toggle input { accent-color: var(--accent); cursor: pointer; }
+
+  .svg-wrapper {
+    flex: 1;
+    min-height: 440px;
+    background: radial-gradient(circle at center, #fef3c7 0%, #fde68a 65%, #f59e0b 100%);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.25);
+    border: 2px solid #fbbf24;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    user-select: none;
+  }
+
+  /* SVG 互動樣式 */
+  .interactive-node {
+    cursor: pointer;
+    transition: filter 0.2s, opacity 0.25s, transform 0.3s;
+  }
+  .interactive-node:hover {
+    filter: drop-shadow(0px 0px 8px rgba(0, 0, 0, 0.6)) brightness(1.08);
+  }
+  .interactive-node.selected {
+    filter: drop-shadow(0px 0px 12px #0284c7) brightness(1.1);
+  }
+
+  .node-label {
+    font-size: 13px;
+    font-weight: bold;
+    fill: #1e293b;
+    paint-order: stroke;
+    stroke: #ffffff;
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .quiz-hidden .node-label {
+    opacity: 0;
+  }
+
+  /* 右側資訊面板 */
+  .info-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .info-card {
+    background: var(--panel-bg);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid var(--border);
+  }
+
+  .info-card h2 {
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .info-card .eng-sub {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: normal;
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 12px 0;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 0.78rem;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: var(--card-bg);
+    color: #e2e8f0;
+  }
+
+  .info-section {
+    margin-top: 12px;
+    line-height: 1.6;
+    font-size: 0.93rem;
+  }
+
+  .info-section strong { color: #fff; }
+
+  .ot-box {
+    margin-top: 14px;
+    background: rgba(245, 158, 11, 0.12);
+    border-left: 4px solid var(--ot-highlight);
+    padding: 12px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .ot-box .ot-title {
+    color: var(--ot-highlight);
+    font-weight: bold;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* 快速索引按鈕區 */
+  .quick-index {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .index-item {
+    background: var(--card-bg);
+    border: 1px solid transparent;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .index-item:hover { border-color: var(--accent); background: #3b4f6b; }
+  .index-item.active { border-color: var(--accent); background: rgba(56, 189, 248, 0.18); }
+
+  .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>
+      <span>🔬 固有結締組織互動解構圖</span>
+      <span class="badge">OT 職能治療臨床連結版</span>
+    </h1>
+    <p>點擊下方按鈕切換「5 大組織分類」，或直接點擊顯微視窗中的「細胞與纖維」查看解剖構造與職能治療臨床意義。</p>
+  </div>
+</header>
+
+<!-- 組織分類切換列 -->
+<div class="mode-bar">
+  <div class="mode-bar-title">📂 步驟 1：切換固有結締組織分類（觀察纖維密度與細胞比例的變化）</div>
+  <button class="btn active" onclick="setTissueMode('loose', this)">1. 疏鬆結締組織</button>
+  <button class="btn" onclick="setTissueMode('dense_reg', this)">2A. 緻密規則結締組織</button>
+  <button class="btn" onclick="setTissueMode('dense_irreg', this)">2B. 緻密不規則結締組織</button>
+  <button class="btn" onclick="setTissueMode('elastic', this)">3. 彈性結締組織</button>
+  <button class="btn" onclick="setTissueMode('reticular', this)">4. 網狀結締組織</button>
+  <button class="btn" onclick="setTissueMode('adipose', this)">5. 脂肪組織</button>
+  <button class="btn btn-quiz" id="quizBtn" onclick="toggleQuizMode()">🎯 跑台自測模式：關閉</button>
+</div>
+
+<div class="main-container">
+  <!-- 左側：互動顯微畫布 -->
+  <div class="canvas-panel">
+    <div class="layer-controls">
+      <span style="color:var(--text-muted); display:flex; align-items:center;">👁️ 圖層開關：</span>
+      <label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('layer-collagen', this.checked)"> 膠原纖維</label>
+      <label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('layer-elastic', this.checked)"> 彈性纖維</label>
+      <label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('layer-reticular', this.checked)"> 網狀纖維</label>
+      <label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('layer-cells', this.checked)"> 五大細胞與血管</label>
+      <label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('layer-labels', this.checked)"> 中文標籤</label>
+    </div>
+
+    <div class="svg-wrapper" id="svgContainer">
+      <svg viewBox="0 0 800 500" id="microSvg">
+        <defs>
+          <!-- 膠原纖維漸層 -->
+          <linearGradient id="collagenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#f472b6" stop-opacity="0.85"/>
+            <stop offset="50%" stop-color="#fb7185" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#f472b6" stop-opacity="0.85"/>
+          </linearGradient>
+          <!-- 血管漸層 -->
+          <linearGradient id="vesselGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#dc2626"/>
+            <stop offset="50%" stop-color="#ef4444"/>
+            <stop offset="100%" stop-color="#b91c1c"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 背景基質點擊區 -->
+        <rect x="0" y="0" width="800" height="500" fill="transparent" onclick="selectItem('ground_substance')" style="cursor:pointer;" />
+
+        <!-- 動態生成的纖維層 -->
+        <g id="layer-reticular"></g>
+        <g id="layer-collagen"></g>
+        <g id="layer-elastic"></g>
+
+        <!-- 細胞與微血管層 -->
+        <g id="layer-cells"></g>
+
+        <!-- 標籤層 -->
+        <g id="layer-labels"></g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 右側：解說與索引面板 -->
+  <div class="info-panel">
+    <!-- 目前組織分類總覽 -->
+    <div class="info-card" id="tissueOverviewCard">
+      <h2 id="tissueTitle">疏鬆結締組織 <span class="eng-sub" id="tissueEng">Loose (Areolar) Connective Tissue</span></h2>
+      <div class="info-section" id="tissueDesc"></div>
+      <div class="ot-box">
+        <div class="ot-title">🩺 OT 職能治療臨床核心連結</div>
+        <div id="tissueOT"></div>
+      </div>
+    </div>
+
+    <!-- 點擊構造詳細解說 -->
+    <div class="info-card" style="border-color: var(--accent);">
+      <h2 id="itemTitle">👆 點擊左側構造查看詳解 <span class="eng-sub" id="itemEng">Select any structure</span></h2>
+      <div class="tag-row" id="itemTags"></div>
+      <div class="info-section" id="itemDesc">點擊左側顯微鏡畫面中的任何細胞、纖維或背景基質，也可以直接點擊下方快速索引按鈕來複習重點。</div>
+      <div class="ot-box" id="itemOTBox">
+        <div class="ot-title">🖐️ 臨床復健與手部治療觀點</div>
+        <div id="itemOT">認識每種細胞與纖維的力學特性，能幫助我們判斷副木（Splint）該用多大的拉力、以及為何水腫與疤痕會限制個案的日常職能活動。</div>
+      </div>
+
+      <!-- 快速點擊索引 -->
+      <div style="margin-top: 16px; font-size: 0.82rem; color: var(--text-muted); font-weight: bold;">📌 構造快速索引（點擊可直接高亮並顯示解說）：</div>
+      <div class="quick-index">
+        <div class="index-item" onclick="selectItem('fibroblast')"><span class="color-dot" style="background:#7c3aed;"></span>成纖維細胞 (Fibroblast)</div>
+        <div class="index-item" onclick="selectItem('macrophage')"><span class="color-dot" style="background:#059669;"></span>巨噬細胞 (Macrophage)</div>
+        <div class="index-item" onclick="selectItem('adipocyte')"><span class="color-dot" style="background:#facc15;"></span>脂肪細胞 (Adipocyte)</div>
+        <div class="index-item" onclick="selectItem('stem_cell')"><span class="color-dot" style="background:#0284c7;"></span>間葉幹細胞 (Stem Cell)</div>
+        <div class="index-item" onclick="selectItem('mast_cell')"><span class="color-dot" style="background:#e11d48;"></span>肥大/肥胖細胞 (Mast Cell)</div>
+        <div class="index-item" onclick="selectItem('collagen')"><span class="color-dot" style="background:#fb7185;"></span>膠原纖維 (Collagen)</div>
+        <div class="index-item" onclick="selectItem('elastic')"><span class="color-dot" style="background:#1e3a8a;"></span>彈性纖維 (Elastic)</div>
+        <div class="index-item" onclick="selectItem('reticular')"><span class="color-dot" style="background:#64748b;"></span>網狀纖維 (Reticular)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 資料庫：五大分類說明
+  const tissueModes = {
+    loose: {
+      title: "1. 疏鬆結締組織",
+      eng: "Loose (Areolar) Connective Tissue",
+      desc: "<strong>結構特點：</strong>半流動狀的「基質（Ground substance）」空間最大，富含水分與玻尿酸；三種纖維（膠原、彈性、網狀）呈現稀疏、鬆散的多方向交織，且同時擁有完整的五大類細胞。<br><strong>主要分布：</strong>皮下組織淺層（淺筋膜）、包覆血管與神經周圍、黏膜下層。",
+      ot: "這是人體內部的「滑動與潤滑層」。當個案手部外傷或骨折打石膏後出現<strong>水腫（Edema）</strong>，過多的組織液就是堆積在疏鬆結締組織的基質中！若OT未及時透過抬高、主動運動或向心按摩消除水腫，富含蛋白質的水腫液會引導成纖維細胞過度分泌膠原，使原本疏鬆的滑動層變成僵硬的沾黏組織。"
+    },
+    dense_reg: {
+      title: "2A. 緻密規則結締組織",
+      eng: "Dense Regular Connective Tissue",
+      desc: "<strong>結構特點：</strong>幾乎被粗大、<strong>平行排列的膠原纖維束</strong>填滿，基質極少。細胞幾乎只剩下被擠壓在纖維束縫隙中的「成纖維細胞（肌腱細胞）」，且缺乏微血管分布。<br><strong>主要分布：</strong>肌腱（Tendons，連骨與肉）、韌帶（Ligaments，連骨與骨）、腱膜。",
+      ot: "因為膠原纖維順應單一拉力方向平行排列，能承受極大的單向張力。但由於<strong>內部血管極少、新陳代謝慢</strong>，當個案發生「屈指肌腱斷裂（Flexor tendon injury）」縫合後，需要長達 6～12 週的結構癒合期；OT 必須製作保護性副木並執行早期控制下被動運動（如 Duran 或 Kleinert protocol），避免肌腱斷掉又防止沾黏。"
+    },
+    dense_irreg: {
+      title: "2B. 緻密不規則結締組織",
+      eng: "Dense Irregular Connective Tissue",
+      desc: "<strong>結構特點：</strong>同樣含有高密度的粗大膠原纖維束，但纖維束呈現<strong>多方向、不規則的立體交錯編織</strong>，主要細胞為成纖維細胞。<br><strong>主要分布：</strong>皮膚真皮層深層（網狀層）、關節囊（Joint capsule）、包裹肌肉的深層筋膜、骨膜。",
+      ot: "多方向的膠原編織讓它能抵抗來自四面八方的拉扯（例如皮膚被捏起、關節多方向轉動）。當個案長期臥床或關節固定不動時，關節囊內的膠原纖維會產生異常的「橫向交聯（Cross-links）」，造成<strong>關節囊攣縮</strong>；OT 需要使用關節鬆動術（Joint mobilization）或長時間低負荷副木（LLPS）來重塑這些交錯的纖維。"
+    },
+    elastic: {
+      title: "3. 彈性結締組織",
+      eng: "Elastic Connective Tissue",
+      desc: "<strong>結構特點：</strong>由密集、粗大且常呈平行波浪狀分支的<strong>彈性纖維（Elastic fibers）</strong>為主導，成纖維細胞散佈於纖維之間。<br><strong>主要分布：</strong>脊椎之間的<strong>黃韌帶（Ligamentum flavum）</strong>、項韌帶、聲帶、主動脈等大動脈管壁。",
+      ot: "具備如同高強度橡皮筋般的「延展與回彈儲能」特性。例如我們彎腰撿東西再挺直脊椎時，脊椎後方的黃韌帶（彈性結締組織）會透過回彈力協助背部肌群省力。高齡長者因為彈性蛋白退化斷裂，脊椎與血管的順應性都會明顯下降。"
+    },
+    reticular: {
+      title: "4. 網狀結締組織",
+      eng: "Reticular Connective Tissue",
+      desc: "<strong>結構特點：</strong>由極細的<strong>網狀纖維（第 III 型膠原蛋白）</strong>交織成精細的 3D 立體海綿狀網架，網架上附著特化的成纖維細胞（網狀細胞）以及大量游走的巨噬細胞與淋巴球。<br><strong>主要分布：</strong>淋巴結、脾臟、紅骨髓、肝臟等軟質器官的內部支撐骨架（基質 Stroma）。",
+      ot: "除了構成免疫與造血器官的立體支架外，在<strong>傷口癒合的增生期初期（受傷後第 3～5 天起）</strong>，成纖維細胞也會先分泌細緻的網狀纖維（第 III 型膠原）作為臨時軟支架，之後才會逐漸重塑替換為強韌的第 I 型膠原纖維。"
+    },
+    adipose: {
+      title: "5. 脂肪組織",
+      eng: "Adipose Tissue",
+      desc: "<strong>結構特點：</strong>由極度密集的<strong>脂肪細胞（Adipocytes）</strong>聚集而成，每個細胞內含巨大油滴，將細胞核擠到最邊緣（呈戒指狀 Signet-ring 外觀）。細胞間有豐富的微血管與少量網狀/膠原纖維分隔。<br><strong>主要分布：</strong>皮下脂肪層、內臟周圍、眼眶後側、<strong>手掌與腳底的脂肪墊（Fat pads）</strong>。",
+      ot: "對職能治療師而言，手掌心與指腹的脂肪墊具有不可取代的<strong>生物力學緩衝與抓握穩定功能</strong>！它能吸收操作工具時的反作用力，並在精細捏取（Pinch）時順應物體表面變形以增加接觸面積。高齡者或消瘦病患因脂肪墊萎縮，使用硬質輔具或穿戴副木時極易產生壓瘡（Pressure injury），製作副木時必須特別加上內襯減壓。"
+    }
+  };
+
+  // 資料庫：五大細胞 + 三種纖維 + 基質詳解
+  const structureData = {
+    fibroblast: {
+      title: "成纖維細胞（纖維母細胞）",
+      eng: "Fibroblast",
+      tags: ["固有常駐細胞", "合成與修復主力", "梭形多突細胞"],
+      desc: "固有結締組織中<strong>數量最多、最重要的常駐細胞</strong>。外觀呈紡錘狀（梭形）並帶有長突起，細胞核呈橢圓形。它是組織裡的「總工程師」，負責合成並分泌所有的<strong>膠原纖維、彈性纖維、網狀纖維</strong>以及細胞間基質（玻尿酸、蛋白聚醣）。當成熟且處於靜止狀態時，稱為纖維細胞（Fibrocyte）。",
+      ot: "<strong>疤痕與副木重塑的核心角色：</strong>組織受傷後，成纖維細胞會被活化並轉化為具收縮力的「肌成纖維細胞（Myofibroblast）」，使傷口收縮並大量吐出膠原蛋白。在燒燙傷或手外傷個案中，若缺乏適當的壓力衣（Pressure garment）與副木固定在抗攣縮擺位，成纖維細胞會讓疤痕隆起並嚴重攣縮，導致關節無法伸直。"
+    },
+    macrophage: {
+      title: "巨噬細胞",
+      eng: "Macrophage",
+      tags: ["免疫防禦與清道夫", "吞噬作用", "由單核球分化"],
+      desc: "由血液中的單核球（Monocyte）穿出微血管進入結締組織後分化而成。外觀呈現不規則阿米巴狀（有偽足突起），可分為固定型（組織球）與游走型。負責<strong>吞噬外來病菌、壞死的組織碎片與老化細胞</strong>，並能將抗原呈現給淋巴球，啟動免疫反應。",
+      ot: "在組織受傷後的「發炎期（Inflammatory phase，約 1～5 天）」，巨噬細胞不僅負責把壞死組織清乾淨（沒有清乾淨傷口就無法進入增生期），還會分泌生長因子（如 TGF-β）來呼叫成纖維細胞進場修補。因此，發炎期適度的巨噬細胞反應是組織修復的必要過程。"
+    },
+    adipocyte: {
+      title: "脂肪細胞",
+      eng: "Adipocyte (Fat Cell)",
+      tags: ["儲能與保溫", "機械性減震緩衝", "戒指狀外觀"],
+      desc: "專門合成與儲存三酸甘油酯（中性脂肪）的球形大細胞。在單泡脂肪（白色脂肪）中，單一巨大的油滴佔據了幾乎整個細胞體積，把細胞質與<strong>細胞核擠壓到最邊緣</strong>，顯微鏡下看起來就像一枚「藍寶石戒指（Signet-ring）」。",
+      ot: "單顆或小群的脂肪細胞常散佈在疏鬆結締組織中；當大量聚集時即形成「脂肪組織」。在手掌魚際（Thenar/Hypothenar）、掌指關節掌側與指腹，脂肪細胞與纖維隔膜共同構成「壓力緩衝室」，保護底下的屈指肌腱、正中神經與指神經免受抓握壓迫。"
+    },
+    stem_cell: {
+      title: "間葉幹細胞",
+      eng: "Mesenchymal Stem Cell (MSC)",
+      tags: ["多潛能未分化細胞", "組織再生儲備軍", "常沿微血管分布"],
+      desc: "殘留在成人固有結締組織中的<strong>多潛能幹細胞（常分布於微血管周圍，又稱周細胞 Pericytes）</strong>。外觀呈星芒狀或小型紡錘狀，平時處於靜止備戰狀態；一旦組織遭受創傷或需要新生血管、修復結構時，就能分裂並分化為新的成纖維細胞、脂肪細胞、甚至是軟骨或硬骨細胞。",
+      ot: "這是人體自我修復的「預備役部隊」。在復健醫學與再生醫療中，適度的機械性應力刺激（Mechanical loading，例如職能治療中漸進式的治療性活動與肌力訓練）能透過細胞力學傳導（Mechanotransduction），引導間葉幹細胞往正確的組織方向分化與修復。"
+    },
+    mast_cell: {
+      title: "肥大細胞（肥胖細胞）",
+      eng: "Mast Cell",
+      tags: ["發炎與過敏警報器", "含組織胺與肝素", "常駐於微血管旁"],
+      desc: "注意：<strong>「肥胖細胞」不是脂肪細胞！</strong>它是因為細胞質裡塞滿了粗大的嗜鹼性分泌顆粒、看起來胖胖的而得名。常沿著小血管排列，顆粒內富含<strong>組織胺（Histamine，使血管擴張、通透性大增）</strong>與<strong>肝素（Heparin，抗凝血）</strong>。",
+      ot: "當個案扭傷、挫傷或接觸過敏原時，肥大細胞會瞬間「去顆粒化（Degranulation）」，釋放組織胺，讓微血管擴張並漏出液體到疏鬆結締組織中，立即引發臨床上看到的<strong>「紅、腫、熱、痛」急性發炎反應</strong>。此時 OT 會採取 PRICE 原則（保護、休息、冰敷、壓迫、抬高）來控制過度的血管滲出。"
+    },
+    collagen: {
+      title: "膠原纖維",
+      eng: "Collagen Fibers (Type I)",
+      tags: ["抗張力最強", "粉紅/白色粗束狀", "韌度如鋼索"],
+      desc: "固有結締組織中含量最豐富的纖維，主要由<strong>第 I 型膠原蛋白</strong>三股螺旋聚集而成。外觀呈現粗大、帶有些微波浪狀的束狀結構（H&E 染色下呈粉紅色，活體下呈白色，故又稱白纖維）。它的<strong>抗拉伸強度極高</strong>（同重量下比鋼絲還耐拉），但幾乎沒有被拉長的彈性。",
+      ot: "<strong>為什麼副木（Splint）不能硬拗關節，而要用「長時間、低負荷」？</strong><br>因為膠原纖維平時有微小的波浪狀皺褶（Crimp），輕拉時會先被拉直（Elastic region）；若用力硬扳會直接撕裂發炎！唯有透過<strong>長時間低負荷牽拉（Low-Load Prolonged Stretch, LLPS，如配戴序列性靜態副木 Serial static splint 每次數小時）</strong>，才能誘發膠原纖維產生「潛變（Creep）」與生物性重塑，安全地增加關節活動度（ROM）。"
+    },
+    elastic: {
+      title: "彈性纖維",
+      eng: "Elastic Fibers",
+      tags: ["高延展與回彈力", "細長分支狀", "含彈性蛋白 Elastin"],
+      desc: "由核心的<strong>彈性蛋白（Elastin）</strong>與外圍的微原纖維（Fibrillin）組成，在新鮮組織中呈淡黃色（故又稱黃纖維）。纖維較細且會互相分支交織成網，可被拉長至原本長度的 <strong>1.5 倍（150%）</strong>，且外力消失後能立刻回彈恢復原狀。",
+      ot: "彈性纖維賦予皮膚、肺部與特定韌帶良好的「順應性與回彈力」。當我們幫燒燙傷患者評估植皮或深層疤痕時，因為新生疤痕組織極度缺乏彈性纖維（幾乎全是排列雜亂的膠原纖維），所以疤痕摸起來又硬又沒有回彈感，這也是我們在臨床觸診時的重要判斷依據。"
+    },
+    reticular: {
+      title: "網狀纖維",
+      eng: "Reticular Fibers (Type III Collagen)",
+      tags: ["精細立體支撐網", "第 III 型膠原蛋白", "鍍銀染色呈黑色"],
+      desc: "由<strong>第 III 型膠原蛋白</strong>構成，外覆醣蛋白。纖維非常纖細，不會聚集成粗束，而是彼此分支交織成細密的「立體網格（Meshwork）」。因為能被銀鹽染成黑色，又稱為嗜銀纖維（Argyrophilic fibers）。",
+      ot: "主要包覆在微血管、神經纖維、肌肉纖維外圍以及淋巴器官中，提供柔軟卻穩固的支撐邊界。在傷口癒合初期（肉芽組織形成階段），成纖維細胞會先大量鋪設網狀纖維（第 III 型膠原），此時傷口結構還很脆弱；隨著復健進展與張力刺激，才會逐步轉換為強韌的第 I 型膠原纖維。"
+    },
+    ground_substance: {
+      title: "細胞間基質與微血管",
+      eng: "Ground Substance & Capillary",
+      tags: ["富含玻尿酸與蛋白聚醣", "水分鎖定與物質交換", "組織滑動介質"],
+      desc: "填充在所有細胞與纖維之間的無定形凝膠狀物質（畫面黃色背景區域）。主要由<strong>糖胺聚醣（GAGs，如玻尿酸 Hyaluronic acid）</strong>、蛋白聚醣與結構醣蛋白組成，帶有大量負電荷，能像海綿一樣鎖住大量水分（組織液），是氧氣與養分從微血管擴散到細胞的必經通道。",
+      ot: "基質的「黏稠度（Viscosity）」直接決定組織滑動的順暢度！當個案長時間固定不動時，基質水分流失、玻尿酸聚合變黏稠，導致筋膜與肌腱滑動阻力大增。OT 執行<strong>溫熱治療（熱敷、超音波）與主動暖身活動</strong>，能產生「搖溶現象（Thixotropy）」，讓基質由濃稠凝膠變回流暢液態，這就是為什麼熱敷完立刻做關節運動效果最好！"
+    }
+  };
+
+  let currentMode = 'loose';
+  let quizMode = false;
+
+  // 切換組織分類模式並重繪 SVG
+  function setTissueMode(mode, btnEl) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-bar .btn:not(.btn-quiz)').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    const info = tissueModes[mode];
+    document.getElementById('tissueTitle').innerHTML = `${info.title} <span class="eng-sub">${info.eng}</span>`;
+    document.getElementById('tissueDesc').innerHTML = info.desc;
+    document.getElementById('tissueOT').innerHTML = info.ot;
+
+    renderMicroscope(mode);
+  }
+
+  // 圖層顯示/隱藏控制
+  function toggleLayer(layerId, visible) {
+    const el = document.getElementById(layerId);
+    if (el) el.style.display = visible ? 'block' : 'none';
+  }
+
+  // 跑台自測模式切換
+  function toggleQuizMode() {
+    quizMode = !quizMode;
+    const btn = document.getElementById('quizBtn');
+    const svg = document.getElementById('microSvg');
+    if (quizMode) {
+      btn.textContent = "🎯 跑台自測模式：開啟中（點擊構造揭曉答案）";
+      btn.classList.add('active');
+      svg.classList.add('quiz-hidden');
+    } else {
+      btn.textContent = "🎯 跑台自測模式：關閉";
+      btn.classList.remove('active');
+      svg.classList.remove('quiz-hidden');
+    }
+  }
+
+  // 點擊選取特定構造
+  function selectItem(key) {
+    const data = structureData[key];
+    if (!data) return;
+
+    document.getElementById('itemTitle').innerHTML = `${data.title} <span class="eng-sub">${data.eng}</span>`;
+    document.getElementById('itemTags').innerHTML = data.tags.map(t => `<span class="tag">${t}</span>`).join('');
+    document.getElementById('itemDesc').innerHTML = data.desc;
+    document.getElementById('itemOT').innerHTML = data.ot;
+
+    // 高亮選中效果
+    document.querySelectorAll('.interactive-node').forEach(el => {
+      if (el.dataset.key === key) {
+        el.classList.add('selected');
+      } else {
+        el.classList.remove('selected');
+      }
+    });
+
+    document.querySelectorAll('.index-item').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('onclick').includes(key));
+    });
+  }
+
+  // 繪製不同組織分類下的微觀結構
+  function renderMicroscope(mode) {
+    const gCol = document.getElementById('layer-collagen');
+    const gEla = document.getElementById('layer-elastic');
+    const gRet = document.getElementById('layer-reticular');
+    const gCells = document.getElementById('layer-cells');
+    const gLabels = document.getElementById('layer-labels');
+
+    gCol.innerHTML = '';
+    gEla.innerHTML = '';
+    gRet.innerHTML = '';
+    gCells.innerHTML = '';
+    gLabels.innerHTML = '';
+
+    // 1. 根據模式繪製網狀纖維
+    if (mode === 'loose' || mode === 'reticular' || mode === 'adipose') {
+      const paths = mode === 'reticular' ? [
+        "M 40,60 Q 180,120 320,50 T 620,90 T 770,40",
+        "M 20,180 Q 200,100 380,200 T 760,170",
+        "M 60,320 Q 240,260 410,340 T 750,300",
+        "M 30,440 Q 220,380 420,450 T 770,420",
+        "M 150,20 Q 190,220 130,480",
+        "M 350,20 Q 310,250 380,480",
+        "M 560,20 Q 610,240 540,480",
+        "M 90,120 L 260,240 L 420,130 L 600,270 L 720,150",
+        "M 110,380 L 290,260 L 470,390 L 650,280"
+      ] : [
+        "M 60,90 Q 220,150 360,80 T 720,120",
+        "M 100,410 Q 300,340 500,420 T 740,360",
+        "M 220,40 Q 260,240 200,460",
+        "M 580,50 Q 530,260 610,450"
+      ];
+      paths.forEach((d, idx) => {
+        gRet.innerHTML += `<path d="${d}" fill="none" stroke="#64748b" stroke-width="${mode==='reticular'?2.5:1.8}" stroke-dasharray="5,4" class="interactive-node" data-key="reticular" onclick="selectItem('reticular')"/>`;
+      });
+      addLabel(gLabels, mode === 'reticular' ? 420 : 235, mode === 'reticular' ? 125 : 75, "網狀纖維 (第III型膠原)");
+    }
+
+    // 2. 根據模式繪製膠原纖維
+    if (mode === 'loose') {
+      const colPaths = [
+        "M -20,120 Q 180,60 400,150 T 820,100",
+        "M -20,370 Q 220,430 450,320 T 820,390",
+        "M 120,-20 Q 240,220 160,520",
+        "M 640,-20 Q 520,240 670,520",
+        "M 40,460 Q 380,240 740,50"
+      ];
+      colPaths.forEach(d => {
+        gCol.innerHTML += `<path d="${d}" fill="none" stroke="url(#collagenGrad)" stroke-width="18" stroke-linecap="round" class="interactive-node" data-key="collagen" onclick="selectItem('collagen')"/>`;
+      });
+      addLabel(gLabels, 420, 140, "膠原纖維 (第I型膠原)");
+    } else if (mode === 'dense_reg') {
+      for (let y = 45; y <= 465; y += 42) {
+        const d = `M -20,${y} Q 200,${y - 18} 400,${y} T 820,${y - 8}`;
+        gCol.innerHTML += `<path d="${d}" fill="none" stroke="url(#collagenGrad)" stroke-width="28" stroke-linecap="round" class="interactive-node" data-key="collagen" onclick="selectItem('collagen')"/>`;
+      }
+      addLabel(gLabels, 400, 90, "平行排列之粗大膠原纖維束 (肌腱/韌帶)");
+    } else if (mode === 'dense_irreg') {
+      const irregPaths = [
+        "M -20,70 Q 240,180 500,60 T 820,140",
+        "M -20,200 Q 300,80 550,240 T 820,190",
+        "M -20,340 Q 220,440 480,300 T 820,370",
+        "M -20,450 Q 280,350 560,460 T 820,420",
+        "M 90,-20 Q 200,250 70,520",
+        "M 280,-20 Q 160,260 330,520",
+        "M 510,-20 Q 640,230 470,520",
+        "M 700,-20 Q 580,260 730,520",
+        "M 20,490 L 780,20",
+        "M 30,20 L 770,480"
+      ];
+      irregPaths.forEach(d => {
+        gCol.innerHTML += `<path d="${d}" fill="none" stroke="url(#collagenGrad)" stroke-width="24" stroke-linecap="round" class="interactive-node" data-key="collagen" onclick="selectItem('collagen')"/>`;
+      });
+      addLabel(gLabels, 390, 210, "多方向交錯之膠原纖維束 (關節囊/真皮層)");
+    } else if (mode === 'elastic') {
+      // 少量膠原纖維襯底
+      gCol.innerHTML += `<path d="M -20,150 Q 400,190 820,140" fill="none" stroke="url(#collagenGrad)" stroke-width="14" opacity="0.5" class="interactive-node" data-key="collagen" onclick="selectItem('collagen')"/>`;
+      gCol.innerHTML += `<path d="M -20,360 Q 400,320 820,370" fill="none" stroke="url(#collagenGrad)" stroke-width="14" opacity="0.5" class="interactive-node" data-key="collagen" onclick="selectItem('collagen')"/>`;
+    }
+
+    // 3. 根據模式繪製彈性纖維
+    if (mode === 'loose' || mode === 'dense_irreg') {
+      const elaPaths = [
+        "M 30,220 C 180,160 280,290 440,210 S 660,150 780,240",
+        "M 160,40 C 240,180 150,310 290,460",
+        "M 480,30 C 420,190 550,300 460,470",
+        "M 240,235 Q 350,310 495,280"
+      ];
+      elaPaths.forEach(d => {
+        gEla.innerHTML += `<path d="${d}" fill="none" stroke="#1e3a8a" stroke-width="3.5" class="interactive-node" data-key="elastic" onclick="selectItem('elastic')"/>`;
+      });
+      addLabel(gLabels, 330, 230, "彈性纖維 (Elastin)");
+    } else if (mode === 'elastic') {
+      for (let y = 55; y <= 455; y += 38) {
+        const d = `M -10,${y} C 130,${y-25} 250,${y+25} 390,${y} S 640,${y-25} 810,${y}`;
+        gEla.innerHTML += `<path d="${d}" fill="none" stroke="#1e3a8a" stroke-width="6.5" class="interactive-node" data-key="elastic" onclick="selectItem('elastic')"/>`;
+      }
+      // 分支連線
+      gEla.innerHTML += `<path d="M 180,55 L 230,131 M 450,93 L 510,169 M 280,245 L 340,321 M 580,283 L 630,359" stroke="#1e3a8a" stroke-width="5" class="interactive-node" data-key="elastic" onclick="selectItem('elastic')"/>`;
+      addLabel(gLabels, 410, 82, "密集波浪狀彈性纖維 (如脊椎黃韌帶)");
+    }
+
+    // 4. 根據模式繪製五大細胞與微血管
+    if (mode === 'loose') {
+      drawCapillary(gCells, gLabels, 650, 390);
+      drawFibroblast(gCells, gLabels, 210, 160, 0, true);
+      drawFibroblast(gCells, gLabels, 530, 290, -20, false);
+      drawMacrophage(gCells, gLabels, 230, 340, true);
+      drawAdipocyte(gCells, gLabels, 630, 140, 58, true);
+      drawAdipocyte(gCells, gLabels, 715, 200, 44, false);
+      drawStemCell(gCells, gLabels, 450, 395, true);
+      drawMastCell(gCells, gLabels, 545, 425, true);
+    } else if (mode === 'dense_reg') {
+      // 平行擠壓的成纖維細胞（肌腱細胞）
+      drawFibroblast(gCells, gLabels, 230, 108, 0, true, "成纖維細胞 (肌腱細胞)");
+      drawFibroblast(gCells, gLabels, 560, 192, 0, false);
+      drawFibroblast(gCells, gLabels, 310, 276, 0, false);
+      drawFibroblast(gCells, gLabels, 610, 360, 0, false);
+      drawFibroblast(gCells, gLabels, 180, 402, 0, false);
+    } else if (mode === 'dense_irreg') {
+      drawFibroblast(gCells, gLabels, 240, 140, 28, true);
+      drawFibroblast(gCells, gLabels, 550, 160, -35, false);
+      drawFibroblast(gCells, gLabels, 360, 360, 15, false);
+      drawMacrophage(gCells, gLabels, 620, 370, true);
+      drawCapillary(gCells, gLabels, 140, 410);
+    } else if (mode === 'elastic') {
+      drawFibroblast(gCells, gLabels, 260, 150, 5, true);
+      drawFibroblast(gCells, gLabels, 540, 265, -8, false);
+      drawFibroblast(gCells, gLabels, 290, 380, 10, false);
+    } else if (mode === 'reticular') {
+      drawFibroblast(gCells, gLabels, 250, 230, 20, true, "網狀細胞 (特化成纖維細胞)");
+      drawFibroblast(gCells, gLabels, 560, 180, -25, false);
+      drawMacrophage(gCells, gLabels, 390, 330, true);
+      drawMacrophage(gCells, gLabels, 160, 360, false);
+      drawStemCell(gCells, gLabels, 620, 360, true);
+    } else if (mode === 'adipose') {
+      drawCapillary(gCells, gLabels, 400, 455);
+      const fatCoords = [
+        [140, 130, 78, true], [310, 120, 82, false], [490, 130, 76, false], [660, 125, 75, false],
+        [210, 285, 80, false], [390, 280, 84, false], [575, 285, 78, false],
+        [130, 415, 65, false], [675, 410, 68, false]
+      ];
+      fatCoords.forEach(([x, y, r, showLbl]) => drawAdipocyte(gCells, gLabels, x, y, r, showLbl));
+      drawFibroblast(gCells, gLabels, 295, 395, -15, true);
+      drawMastCell(gCells, gLabels, 515, 420, true);
+    }
+  }
+
+  // 輔助繪圖函式：成纖維細胞
+  function drawFibroblast(g, gLbl, x, y, angle, showLabel, customLabel) {
+    g.innerHTML += `
+      <g transform="translate(${x},${y}) rotate(${angle})" class="interactive-node" data-key="fibroblast" onclick="selectItem('fibroblast')">
+        <path d="M -75,0 Q -25,-18 0,-16 Q 25,-18 75,0 Q 35,8 15,35 Q 0,14 -15,35 Q -35,8 -75,0 Z" fill="#8b5cf6" stroke="#4c1d95" stroke-width="2"/>
+        <ellipse cx="0" cy="-2" rx="18" ry="9" fill="#3b0764"/>
+        <circle cx="-5" cy="-2" r="3" fill="#c4b5fd"/>
+      </g>`;
+    if (showLabel) addLabel(gLbl, x - 55, y - 24, customLabel || "成纖維細胞 (Fibroblast)");
+  }
+
+  // 輔助繪圖函式：巨噬細胞
+  function drawMacrophage(g, gLbl, x, y, showLabel) {
+    g.innerHTML += `
+      <g transform="translate(${x},${y})" class="interactive-node" data-key="macrophage" onclick="selectItem('macrophage')">
+        <path d="M -35,-15 C -48,-35 -15,-45 5,-32 C 25,-48 50,-25 38,-5 C 55,15 35,42 12,34 C -5,48 -35,38 -32,15 C -52,8 -45,-8 -35,-15 Z" fill="#10b981" stroke="#065f46" stroke-width="2.5"/>
+        <path d="M -8,-10 C 6,-16 16,-4 10,10 C 4,18 -12,14 -10,2 C -4,0 -4,-6 -8,-10 Z" fill="#064e3b"/>
+        <circle cx="18" cy="-12" r="4" fill="#a7f3d0"/>
+        <circle cx="-18" cy="12" r="5" fill="#a7f3d0"/>
+        <circle cx="15" cy="18" r="3.5" fill="#a7f3d0"/>
+      </g>`;
+    if (showLabel) addLabel(gLbl, x - 55, y + 54, "巨噬細胞 (Macrophage)");
+  }
+
+  // 輔助繪圖函式：脂肪細胞
+  function drawAdipocyte(g, gLbl, x, y, r, showLabel) {
+    g.innerHTML += `
+      <g transform="translate(${x},${y})" class="interactive-node" data-key="adipocyte" onclick="selectItem('adipocyte')">
+        <circle cx="0" cy="0" r="${r}" fill="#fde047" stroke="#ca8a04" stroke-width="3"/>
+        <circle cx="-2" cy="2" r="${r - 6}" fill="#fef08a"/>
+        <!-- 擠到邊緣的戒指狀細胞核 -->
+        <ellipse cx="${r - 8}" cy="-10" rx="5" ry="12" transform="rotate(-15 ${r-8} -10)" fill="#854d0e"/>
+      </g>`;
+    if (showLabel) addLabel(gLbl, x - 50, y + r + 18, "脂肪細胞 (Adipocyte)");
+  }
+
+  // 輔助繪圖函式：間葉幹細胞
+  function drawStemCell(g, gLbl, x, y, showLabel) {
+    g.innerHTML += `
+      <g transform="translate(${x},${y})" class="interactive-node" data-key="stem_cell" onclick="selectItem('stem_cell')">
+        <path d="M 0,-36 L 10,-12 L 36,-10 L 14,6 L 24,32 L 0,16 L -24,32 L -14,6 L -36,-10 L -10,-12 Z" fill="#38bdf8" stroke="#0369a1" stroke-width="2"/>
+        <circle cx="0" cy="2" r="11" fill="#0c4a6e"/>
+        <circle cx="-3" cy="-1" r="3" fill="#bae6fd"/>
+      </g>`;
+    if (showLabel) addLabel(gLbl, x - 65, y - 42, "間葉幹細胞 (Stem Cell)");
+  }
+
+  // 輔助繪圖函式：肥大細胞 (肥胖細胞)
+  function drawMastCell(g, gLbl, x, y, showLabel) {
+    let granules = '';
+    const pts = [[-16,-10],[-6,-18],[8,-16],[18,-8],[-18,4],[16,6],[-12,16],[4,18],[14,15],[-4,12]];
+    pts.forEach(([gx, gy]) => {
+      granules += `<circle cx="${gx}" cy="${gy}" r="3.8" fill="#881337"/>`;
+    });
+    g.innerHTML += `
+      <g transform="translate(${x},${y})" class="interactive-node" data-key="mast_cell" onclick="selectItem('mast_cell')">
+        <ellipse cx="0" cy="0" rx="30" ry="25" fill="#fb7185" stroke="#9f1239" stroke-width="2.5"/>
+        <circle cx="0" cy="-1" r="9" fill="#4c0519"/>
+        ${granules}
+      </g>`;
+    if (showLabel) addLabel(gLbl, x - 70, y + 42, "肥大/肥胖細胞 (Mast Cell)");
+  }
+
+  // 輔助繪圖函式：微血管
+  function drawCapillary(g, gLbl, x, y) {
+    g.innerHTML += `
+      <g transform="translate(${x},${y})" class="interactive-node" data-key="ground_substance" onclick="selectItem('ground_substance')">
+        <path d="M -110,15 Q 0,-15 120,20" fill="none" stroke="url(#vesselGrad)" stroke-width="26" stroke-linecap="round"/>
+        <ellipse cx="-45" cy="8" rx="10" ry="6" fill="#7f1d1d"/>
+        <ellipse cx="5" cy="4" rx="10" ry="6" fill="#7f1d1d"/>
+        <ellipse cx="55" cy="10" rx="10" ry="6" fill="#7f1d1d"/>
+      </g>`;
+    addLabel(gLbl, x - 45, y - 16, "微血管 (Capillary)");
+  }
+
+  function addLabel(gLbl, x, y, text) {
+    gLbl.innerHTML += `<text x="${x}" y="${y}" class="node-label">${text}</text>`;
+  }
+
+  // 初始化載入
+  window.onload = () => {
+    setTissueMode('loose', document.querySelector('.mode-bar .btn'));
+    selectItem('fibroblast');
+  };
+</script>
+</body>
+</html>
