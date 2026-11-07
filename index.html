@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新編解剖學：職能治療互動學習系統 V4.3｜第四章皮膚系統完整教材</title>
+<title>新編解剖學：職能治療互動學習系統 V4.4｜四章品質驗收穩定版</title>
 <style>
   :root {
     --bg-dark: #0f172a;
@@ -588,6 +588,51 @@ button:focus-visible,.nav-item:focus-visible,.index-item:focus-visible,.interact
 @keyframes v43-move{from{stroke-dashoffset:0;opacity:.7}to{stroke-dashoffset:-30;opacity:1}}
 @media(prefers-reduced-motion:reduce){#mainSvg.v43-motion .v43-flow{animation:none}}
 @media(max-width:440px){.layer-controls{row-gap:7px}.sub-btn{min-height:38px}}
+
+/* V4.4｜離線教學穩定化：行動端、安全區、焦點提示、觸控熱區 */
+html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+body { -webkit-tap-highlight-color:transparent; }
+button, .nav-item, .interactive-node { touch-action:manipulation; }
+button:disabled { cursor:not-allowed; }
+#svgContainer { isolation:isolate; touch-action:pan-y; }
+#mainSvg { overflow:visible; }
+#mainSvg .v44-touch-target { fill:transparent; stroke:transparent; pointer-events:all; }
+#mainSvg .v44-touch-stroke { fill:none; stroke:transparent; pointer-events:stroke; }
+#mainSvg .interactive-node:focus { filter:drop-shadow(0 0 8px #fde68a); }
+#sceneContext { line-height:1.5; }
+#sceneContext .v44-picked { color:#fbbf24; font-weight:700; }
+#v44AcadNote { margin-top:10px; color:#b7c6d6; font-size:.76rem; line-height:1.6; }
+#v44AcadNote a { color:#7dd3fc; }
+@media(max-width:1080px) {
+  body { height:100vh; height:100dvh; }
+  header { max-height:none; overflow:visible; padding-top:max(8px,env(safe-area-inset-top)); }
+  .brand { width:100%; }
+  .chapter-tabs { width:100%; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; min-width:0; padding-bottom:5px; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch; }
+  .chap-tab, .btn-quiz-toggle { flex:0 0 auto; min-height:38px; white-space:nowrap; }
+  .learning-toolbar { flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .learning-toolbar > button { white-space:nowrap; flex:0 0 auto; min-height:38px; }
+  .mobile-tab { min-height:44px; }
+  .nav-item { min-height:44px; }
+  .index-item { min-height:40px; }
+  .sub-btn,.v41-control-btn,.quiz-mode,.q-opt { min-height:42px; }
+  .canvas-card { min-height:0; }
+  .svg-wrapper { min-height:260px; }
+  .workspace > aside,.workspace > main { overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; }
+  .v4-toast { left:12px; right:12px; bottom:max(16px,env(safe-area-inset-bottom)); max-width:none; }
+  .dashboard-overlay { padding:12px; padding-bottom:max(12px,env(safe-area-inset-bottom)); }
+  .dashboard-card { max-height:calc(100dvh - 24px); }
+  .note-textarea { font-size:16px; } /* iOS 避免輸入時被強制放大 */
+}
+@media(max-width:440px){
+ .chapter-tabs { gap:6px; }
+ .chap-tab { font-size:.79rem; padding:6px 10px; }
+ .btn-quiz-toggle { font-size:.76rem; }
+ .mobile-nav { padding-bottom:max(6px,env(safe-area-inset-bottom)); }
+ .zoom-actions .v4-zoom { min-height:38px; min-width:42px; }
+ .layer-toggle { min-height:38px; }
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
 </style>
 </head>
 <body>
@@ -595,7 +640,7 @@ button:focus-visible,.nav-item:focus-visible,.index-item:focus-visible,.interact
 <header>
   <div class="brand">
     <h1>📘 新編解剖學：職能治療互動學習系統</h1>
-    <span class="badge">V4.3 第四章｜四章完整互動教材</span>
+    <span class="badge">V4.4 四章品質驗收穩定版</span>
   </div>
   <div class="chapter-tabs">
     <button class="chap-tab active" id="topTab-ch1" onclick="selectChapter('ch1')">第一章：緒論</button>
@@ -608,7 +653,7 @@ button:focus-visible,.nav-item:focus-visible,.index-item:focus-visible,.interact
 
 <div class="learning-toolbar" role="toolbar" aria-label="學習工具列">
   <button class="v4-pill" id="dashboardOpen" onclick="openDashboard()">📊 學習總覽 <strong id="overallProgress">0/36</strong></button>
-  <span class="toolbar-hint" id="currentLearningLabel">目前教材：第一至四章皆已開放</span>
+  <span class="toolbar-hint" id="currentLearningLabel">目前教材：第一至四章完整互動教材</span>
   <div class="toolbar-spacer"></div>
   <button class="v4-action" onclick="exportStudyBackup()" title="匯出所有筆記、進度與測驗紀錄">⬇ 備份 JSON</button>
   <button class="v4-action" onclick="document.getElementById('backupFileInput').click()">⬆ 匯入備份</button>
@@ -641,7 +686,7 @@ button:focus-visible,.nav-item:focus-visible,.index-item:focus-visible,.interact
     <!-- SVG 互動畫布卡 -->
     <div class="canvas-card" id="canvasCard">
       <div class="canvas-topline">
-         <div class="scene-context" id="sceneContext">選取圖中的構造，右側將顯示對應說明。</div>
+         <div class="scene-context" id="sceneContext">選取圖中構造；放大後可拖曳查看細節。</div>
          <div class="zoom-actions">
            <button class="v4-zoom" onclick="zoomStage(1.2)" aria-label="放大圖形">＋</button>
            <button class="v4-zoom" onclick="zoomStage(1/1.2)" aria-label="縮小圖形">－</button>
@@ -724,7 +769,7 @@ button:focus-visible,.nav-item:focus-visible,.index-item:focus-visible,.interact
       <div><h2 id="dashTitle">📊 我的解剖學習總覽</h2><p>教材進度、測驗成果、錯題與備份狀態</p></div>
       <button class="v4-action" onclick="closeDashboard()" aria-label="關閉學習總覽">✕ 關閉</button>
     </div>
-    <div id="dashboardContent"></div>
+    <div id="dashboardContent"></div><p id="v44AcadNote">學術核對來源：OpenStax《Anatomy and Physiology 2e》、NCBI Bookshelf、澳洲 NSW Health 燒傷照護指引。未取得指定《新編解剖學》第四版全文，因此未逐頁比對該書；動態圖均為教學示意，不取代臨床診斷。</p>
   </div>
 </div>
 <div class="v4-toast" id="v4Toast" role="status" aria-live="polite" hidden></div>
@@ -938,7 +983,7 @@ const ch1Data = {
         btn: "A-壹. 背側體腔 (顱腔與椎管) & 貳. 腹側體腔全覽",
         title: "A. 體腔（Body Cavities）— 壹. 背側體腔 & 貳. 腹側體腔",
         eng: "Dorsal Body Cavity & Ventral Body Cavity",
-        desc: "體腔是身體內部容納、保護並隔開內臟器官的空間，以<strong>橫膈（Diaphragm）</strong>與骨骼為界，分為兩大系統：<br><strong>壹、背側體腔（Dorsal cavity）：</strong>位於身體後側，由堅硬骨骼完全包覆保護中樞神經系統，外覆三層<strong>腦脊髓膜（Meninges）</strong>，分為<strong>① 顱腔</strong>与<strong>② 椎管（脊椎腔）</strong>。<br><strong>貳、腹側體腔（Ventral cavity）：</strong>位於身體前側，空間較大，以<strong>橫膈肌</strong>為界分為上方的<strong>① 胸腔</strong>與下方的<strong>② 腹盆腔（腹腔＋骨盆腔）</strong>。",
+        desc: "體腔是身體內部容納、保護並隔開內臟器官的空間，以<strong>橫膈（Diaphragm）</strong>與骨骼為界，分為兩大系統：<br><strong>壹、背側體腔（Dorsal cavity）：</strong>位於身體後側，主要由顱骨與脊柱骨性結構保護中樞神經系統，外覆三層<strong>腦脊髓膜（Meninges）</strong>，分為<strong>① 顱腔</strong>與<strong>② 椎管（脊椎腔）</strong>。<br><strong>貳、腹側體腔（Ventral cavity）：</strong>位於身體前側，空間較大，以<strong>橫膈肌</strong>為界分為上方的<strong>① 胸腔</strong>與下方的<strong>② 腹盆腔（腹腔＋骨盆腔）</strong>。",
         ot: "背側體腔保護大腦與脊髓（中風、腦外傷 TBI、脊髓損傷 SCI 的病灶處）；腹側體腔則容納心肺與消化泌尿器官，體腔內的漿膜液能讓心肺跳動與腸胃蠕動時不產生摩擦痛。"
       }
     },
@@ -962,27 +1007,27 @@ const ch1Data = {
         title: "腹側體腔 — ① 胸腔（Thoracic Cavity）", eng: "Pleural, Pericardial Cavities & Mediastinum",
         tags: ["位於橫膈上方", "左右胸膜腔(肺)", "縱膈與心包腔(心)"],
         desc: "由肋骨、胸骨、胸椎與底部的橫膈所圍成，細分為三部分：<br>• <strong>左、右胸膜腔（Pleural cavities）：</strong>分別容納左肺與右肺，由胸膜（肋膜）包覆。<br>• <strong>縱膈（Mediastinum）：</strong>夾在左右肺之間的中央區域，容納氣管、食道、胸腺、大血管，以及包覆心臟的<strong>心包腔（Pericardial cavity）</strong>。",
-        ot: "<strong>【必考陷阱】肺臟不在縱膈裡！</strong>縱膈是兩肺之間的隔間（含心臟、食道、氣管、主動脈），而左右肺分別在左右胸膜腔內。"
+        ot: "<strong>【必考陷阱】肺臟不在縱膈裡！</strong>縱膈是兩肺之間的隔間（含心臟、食道、氣管、主動脈），而左右肺由各側胸膜囊分別包覆。"
       },
       cav_diaphragm: {
         dot: "#ef4444", shortName: "分界：橫膈 (Diaphragm)",
         title: "胸腔與腹腔的分界 — 橫膈（Diaphragm）", eng: "Thoracic Diaphragm",
         tags: ["胸腔與腹腔分界線", "最主要吸氣肌", "骨骼肌"],
         desc: "呈圓頂傘狀的骨骼肌薄膜，完全隔開上方的<strong>胸腔</strong>與下方的<strong>腹腔</strong>（僅留食道裂孔、主動脈裂孔與腔靜脈孔供管道穿過）。",
-        ot: "橫膈是人體最重要的吸氣肌（負責約 70% 呼吸量），由頸神經 <strong>C3～C5（膈神經 Phrenic nerve）</strong>支配。若高位脊髓損傷高於 C3，患者將無法自主呼吸。"
+        ot: "橫膈是主要吸氣肌之一，受來自 <strong>C3～C5 的膈神經（Phrenic nerve）</strong>支配；高位頸髓損傷可能影響橫膈活動，嚴重時需評估呼吸支持。"
       },
       cav_abdominopelvic: {
         dot: "#10b981", shortName: "腹側：② 腹盆腔 (腹腔 + 骨盆腔)",
         title: "腹側體腔 — ② 腹盆腔（Abdominopelvic Cavity）", eng: "Abdominal & Pelvic Cavities",
         tags: ["橫膈以下", "假想骨盆入口線分界", "腹膜包覆"],
-        desc: "位於橫膈下方，中間並無實體隔膜，而是以骨盆入口上緣（弓狀線）為假想界線分為：<br>• <strong>腹腔（Abdominal cavity）：</strong>容納胃、小腸、大腸大部分、肝、膽、脾、胰、腎臟及輸尿管。<br>• <strong>骨盆腔（Pelvic cavity）：</strong>由骨盆骨圍成，容納<strong>膀胱、直腸、乙狀結腸末端及內生殖器官（子宮、卵巢、攝護腺）</strong>。",
-        ot: "<strong>【國考常考】腎臟與大腦沒有漿膜包覆！</strong>腹腔內的漿膜稱為「腹膜（Peritoneum）」，但腎臟與胰臟位於腹膜後方，稱為「腹膜後器官（Retroperitoneal organs）」。"
+        desc: "位於橫膈下方，中間並無實體隔膜，而是以骨盆入口上緣（弓狀線）為假想界線分為：<br>• <strong>腹腔（Abdominal cavity）：</strong>包括胃、小腸、大腸大部分、肝、膽、脾，以及位於腹膜後的腎臟與胰臟大部分等構造。<br>• <strong>骨盆腔（Pelvic cavity）：</strong>由骨盆骨圍成，容納<strong>膀胱、直腸、乙狀結腸末端及內生殖器官（子宮、卵巢、攝護腺）</strong>。",
+        ot: "<strong>【國考常考】腎臟與大腦沒有漿膜包覆！</strong>腹腔內的漿膜稱為「腹膜（Peritoneum）」，但腎臟及胰臟大部分位於腹膜後方，稱為「腹膜後器官（Retroperitoneal organs）」。"
       },
       serous_mem: {
         dot: "#f59e0b", shortName: "雙層漿膜 (壁層 vs. 臟層)",
         title: "腹側體腔的雙層漿膜（Serous Membrane）", eng: "Parietal vs. Visceral Serosa",
         tags: ["壁層貼體壁", "臟層貼器官表面", "胸膜/心包膜/腹膜"],
-        desc: "腹側體腔內的器官外圍都有雙層漿膜（猶如把拳頭壓進未吹飽的氣球裡）：<br>• <strong>臟層（Visceral layer）：</strong>直接緊貼在內臟器官表面。<br>• <strong>壁層（Parietal layer）：</strong>貼在體腔外壁內面。<br>兩層之間極窄的縫隙含有少量<strong>漿膜液（Serous fluid）</strong>，負責潤滑減摩。",
+        desc: "腹側體腔的胸膜、心包膜與腹膜可形成臟層和壁層；並非每個器官都被漿膜完整包覆（例如多數腹膜後器官）。可用拳頭壓進未吹飽氣球的比喻理解其折返關係：<br>• <strong>臟層（Visceral layer）：</strong>直接緊貼在內臟器官表面。<br>• <strong>壁層（Parietal layer）：</strong>貼在體腔外壁內面。<br>兩層之間極窄的縫隙含有少量<strong>漿膜液（Serous fluid）</strong>，負責潤滑減摩。",
         ot: "三大漿膜名稱必背：肺部稱<strong>胸膜（Pleura）</strong>、心臟稱<strong>心包膜（Pericardium）</strong>、腹腔稱<strong>腹膜（Peritoneum）</strong>。"
       }
     }
@@ -1077,7 +1122,7 @@ const ch1QuizBank = [
     q: "5. 下列哪一個器官「不位於」胸腔中央的縱膈（Mediastinum）內？",
     opts: ["心臟 (Heart)", "氣管與食道 (Trachea & Esophagus)", "肺臟 (Lungs)", "胸腺與主動脈弓 (Thymus & Aortic arch)"],
     ans: 2,
-    exp: "【必考題】縱膈是夾在左右胸膜腔之間的中央區域，容納心臟、大血管、氣管、食道、胸腺；而「肺臟」是位於左右胸膜腔內，不在縱膈中！"
+    exp: "【必考題】縱膈是夾在左右胸膜腔之間的中央區域，容納心臟、大血管、氣管、食道、胸腺；而「肺臟」位於左右胸膜囊內，並非縱膈構造！"
   },
   {
     q: "6. 直接緊貼在肺臟表面的一層漿膜（胸膜／肋膜）稱為？",
@@ -2756,7 +2801,14 @@ V4_IMAGE_QUESTIONS.ch2=[
 let v41Tonicity='iso';
 let v41PlayTimer=null;
 function v41StopPlay(){if(v41PlayTimer!==null){clearInterval(v41PlayTimer);v41PlayTimer=null;}}
-function v41Txt(x,y,t,size=15,color='#f8fafc',anchor='middle',weight=650){return `<text class="node-label-dark" x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" font-weight="${weight}" style="font-size:${size}px;fill:${color};stroke:#0f172a;stroke-width:3px;pointer-events:none">${v4Esc(t)}</text>`;}
+function v44TextStroke(color){
+ const hex=String(color||'').match(/^#([0-9a-f]{6})$/i);
+ if(!hex)return '#0f172a';
+ const x=hex[1],r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);
+ // 暗字在明亮組織圖上使用淺色描邊，避免文字與標籤融合成黑團。
+ return (.2126*r+.7152*g+.0722*b)<140?'#fffaf0':'#0f172a';
+}
+function v41Txt(x,y,t,size=15,color='#f8fafc',anchor='middle',weight=650){const edge=v44TextStroke(color);return `<text class="node-label-dark" x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" font-weight="${weight}" style="font-size:${size}px;fill:${color};stroke:${edge};stroke-width:1.5px;paint-order:stroke;stroke-linejoin:round;pointer-events:none">${v4Esc(t)}</text>`;}
 function v41Hot(key,svg){return `<g class="interactive-node" data-key="${key}" onclick="clickStructureKey('${key}')">${svg}</g>`;}
 function v41Rect(x,y,w,h,fill='#243850',stroke='#64748b',rx=13,sw=2){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;}
 function v41Circle(x,y,r,fill,stroke='#e2e8f0',sw=2){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;}
@@ -3512,7 +3564,7 @@ const V43_CONTENT={
   epidermis:v4Entry('表皮','Epidermis',['無血管','角質形成細胞'],'表皮由角質形成細胞及其他細胞構成，本身無血管，靠真皮供應養分。','表皮屏障、局部感覺與組織修復密切相關。','#fbbf24')
  }},
  ch4_skin_structure:{theme:'theme-epi',goal:'辨認表皮、真皮、皮下組織及表皮細胞層次，區分厚皮與薄皮。',compare:'「厚皮」專指掌跖部表皮較厚、具有透明層且無毛囊；真皮與皮下組織厚度不能用厚皮／薄皮一詞直接推定。',modes:{
-  overview:{btn:'皮膚三層透視',title:'A-貳. 皮膚構造｜表皮、真皮、皮下組織',eng:'Skin Cross Section',desc:'皮膚主要由<strong>表皮（epidermis）</strong>和<strong>真皮（dermis）</strong>構成，下方連續到<strong>皮下組織（hypodermis）</strong>。表皮無血管，真皮含血管、神經、腺體及結締組織；皮下組織常富含脂肪，具有緩衝與保溫作用。',ot:'皮膚厚度、彈性與局部脂肪分布會影響副木壓力點與長期坐姿皮膚保護。'},
+  overview:{btn:'皮膚分層透視',title:'A-貳. 皮膚構造｜表皮與真皮、下方皮下組織',eng:'Skin Cross Section',desc:'皮膚主要由<strong>表皮（epidermis）</strong>和<strong>真皮（dermis）</strong>構成，下方連續到<strong>皮下組織（hypodermis）</strong>。表皮無血管，真皮含血管、神經、腺體及結締組織；皮下組織常富含脂肪，具有緩衝與保溫作用。',ot:'皮膚厚度、彈性與局部脂肪分布會影響副木壓力點與長期坐姿皮膚保護。'},
   epidermal:{btn:'表皮五層',title:'A-貳. 皮膚構造｜表皮細胞分層',eng:'Epidermal Strata',desc:'厚皮由深至淺可分為<strong>基底層、棘狀層、顆粒層、透明層、角質層</strong>。基底層持續產生角質形成細胞；細胞逐漸向表面移動並角化。薄皮通常沒有明顯透明層。',ot:'表淺擦傷與較深傷口涉及不同皮膚層次，癒合方式與皮膚附屬器官保留程度可能不同。'},
   dermis:{btn:'真皮兩層',title:'A-貳. 皮膚構造｜乳突層與網狀層',eng:'Papillary and Reticular Dermis',desc:'真皮可分為較淺的<strong>乳突層</strong>（較疏鬆結締組織）與較深的<strong>網狀層</strong>（較緻密的不規則結締組織）。真皮內有膠原、彈性纖維、血管、神經與附屬構造。',ot:'疤痕形成與真皮膠原重塑密切相關，活動中的牽拉與關節附近傷口位置都值得關注。'},
   thick:{btn:'厚皮：掌跖',title:'A-貳. 皮膚構造｜厚皮',eng:'Thick Skin (Palms and Soles)',desc:'厚皮常見於<strong>手掌和腳底</strong>，角質層發達、透明層較明顯，且一般無毛囊與皮脂腺；小汗腺仍存在。此處「厚」主要指表皮。',ot:'掌部需要耐磨與精細觸覺，因此表皮保護和感覺受器都重要。'},
@@ -3549,7 +3601,7 @@ const V43_CONTENT={
  partial_deep:{btn:'深層部分皮層',title:'A-肆. 灼傷｜深層部分皮層',eng:'Deep Partial-thickness Burn',desc:'深層部分皮層灼傷侵犯<strong>較深的真皮</strong>，毛囊及汗腺等再生來源可能受到明顯破壞，癒合較慢、疤痕與攣縮風險較高。傷面感覺可減弱，外觀變化多樣。',ot:'跨關節傷口可能伴隨疤痕攣縮與活動受限；實際活動與副木策略須配合燒傷醫療團隊。'},
  full:{btn:'全皮層',title:'A-肆. 灼傷｜全皮層灼傷',eng:'Full-thickness Burn',desc:'全皮層灼傷破壞<strong>整個表皮與真皮</strong>，可呈白色、褐色或焦痂樣外觀；中央傷面因神經末梢破壞，可能感覺降低，但周邊仍可能疼痛。此類灼傷通常需要專業燒傷治療評估。',ot:'全皮層灼傷常需專業傷口處置，職能治療可在適當時機參與姿勢、活動、疤痕及功能重建。'},
  deeper:{btn:'深至皮下／更深',title:'A-肆. 灼傷｜超出皮膚的深度損傷',eng:'Beyond Full Thickness',desc:'部分嚴重灼傷可延伸至<strong>皮下脂肪、筋膜、肌肉或骨</strong>，其深度超過全皮層皮膚，傷害程度與處置需求往往更複雜。此模式為構造層次示意，不提供自我診斷。',ot:'深部灼傷涉及多組織及功能障礙，復健必須與傷口、手術及活動限制共同規劃。'},
- tbsa:{btn:'成人九則法（可點選）',title:'A-肆. 灼傷｜成人體表面積九則計算法',eng:'Adult Rule of Nines — Teaching Estimate',desc:'成人九則法將頭頸、雙上肢、軀幹、雙下肢與會陰分配約9%、18%、36%、36%、1%。<strong>點選人體各區塊</strong>可試算受灼傷體表面積（TBSA）。這只是成人教學用粗估，並不適用於兒童；小範圍和精細評估可用其他方法，由專業人員判讀。<strong>單純表淺灼傷不列入正式灼傷面積計算。</strong>',ot:'OT在燒傷照護更關心受傷的解剖位置、關節活動、疤痕及日常功能；TBSA粗估不可取代燒傷專業評估。'}
+ tbsa:{btn:'成人九則法（可點選）',title:'A-肆. 灼傷｜成人體表面積九則計算法',eng:'Adult Rule of Nines — Teaching Estimate',desc:'成人九則法將頭頸、雙上肢、軀幹、雙下肢與會陰分配約9%、18%、36%、36%、1%。<strong>點選人體各區塊</strong>可試算受灼傷體表面積（TBSA）。此圖將整個前胸腹或後背各視為18%，只適用成人教學粗估，並不適用於兒童；小範圍和精細評估可用其他方法，由專業人員判讀。<strong>單純表淺灼傷不列入正式灼傷面積計算。</strong>',ot:'OT在燒傷照護更關心受傷的解剖位置、關節活動、疤痕及日常功能；TBSA粗估不可取代燒傷專業評估。'}
  },structures:{
   burn_epidermis:v4Entry('表皮受損區','Epidermal Injury',['表淺傷害'],'表淺灼傷主要限於表皮；部分皮層灼傷也會侵犯表皮。','照護應避免不必要的摩擦與傷面刺激。','#ef4444'),
   burn_dermis:v4Entry('真皮受損區','Dermal Injury',['部分皮層','深度變化'],'不同深度的部分皮層灼傷可侵犯真皮淺層或深層，影響再生能力與疤痕風險。','跨關節真皮損傷後活動與疤痕管理需個別化。','#fb7185'),
@@ -3601,6 +3653,9 @@ const V43_CONTENT={
  }}
 };
 
+// 構造資料沿用皮膚分層正式定義，避免真皮／皮下區塊誤顯示成表皮。
+V43_CONTENT.ch4_skin_function.structures.dermis=V43_CONTENT.ch4_skin_structure.structures.dermis;
+V43_CONTENT.ch4_skin_function.structures.hypodermis=V43_CONTENT.ch4_skin_structure.structures.hypodermis;
 for(const [id,unit] of Object.entries(V43_CONTENT)){
  V4_ROUTES[id]={engine:'ch4',modes:Object.keys(unit.modes),start:Object.keys(unit.modes)[0],structures:unit.structures,theme:unit.theme};
  V4_NODES[id].status='done';
@@ -3623,7 +3678,7 @@ V4_QUIZ_BANKS.ch4=[
  {q:'8. 皮膚黑色素主要由何種細胞合成？',opts:['真皮成骨細胞','黑色素細胞','紅血球','皮脂腺細胞'],ans:1,related:'ch4_skin_color',exp:'黑色素細胞位於表皮基底層，產生黑色素體並將其轉移至角質形成細胞。'},
  {q:'9. 下列哪一項同樣會影響皮膚可見色澤？',opts:['真皮血紅素與局部血流','骨骼骨小樑排列','神經節細胞數','腦脊髓液流速'],ans:0,related:'ch4_skin_color',exp:'皮膚色澤與黑色素、血紅素、胡蘿蔔素及光學因素相關。'},
  {q:'10. 下列何者對不同人的膚色差異描述較恰當？',opts:['只由黑色素細胞數目決定','由多種色素機制與分布因素共同影響','與黑色素體完全無關','可直接判斷個人的健康狀況'],ans:1,related:'ch4_skin_color',exp:'色素種類、合成、黑色素體分布及光學因素均有影響；外觀不能直接作健康診斷。'},
- {q:'11. 單純表淺灼傷通常侵犯哪一層？',opts:['表皮','整個真皮與肌肉','骨皮質','關節腔'],ans:0,related:'ch4_skin_burn',exp:'表淺灼傷主要位於表皮，通常不列入正式灼傷TBSA計算。'},
+ {q:'11. 單純表淺灼傷通常侵犯哪一層？',opts:['表皮','整個真皮與肌肉','骨皮質','關節腔'],ans:0,related:'ch4_skin_burn',exp:'單純表淺灼傷僅侵犯表皮，不納入部分皮層及更深灼傷的TBSA估算。'},
  {q:'12. 哪一種灼傷程度會破壞完整的表皮與真皮？',opts:['表淺','淺層部分皮層','全皮層','沒有受損'],ans:2,related:'ch4_skin_burn',exp:'全皮層灼傷破壞全部皮膚厚度；仍須由專業團隊評估。'},
  {q:'13. 成人九則法中，整條單側下肢約占多少體表面積？',opts:['9%','18%','4.5%','1%'],ans:1,related:'ch4_skin_burn',exp:'成人九則法估計單側下肢約18%，前後各9%；兒童比例不同。'},
  {q:'14. 成人九則法的適用限制，何者正確？',opts:['可直接精確套用所有兒童','單純表淺紅斑也應一律計入面積','僅能當成人粗估工具，兒童比例須另行評估','能取代醫院灼傷評估'],ans:2,related:'ch4_skin_burn',exp:'成人九則法不能直接套用兒童，且不取代專業深度與面積評估。'},
@@ -3650,7 +3705,7 @@ V4_IMAGE_QUESTIONS.ch4=[
 // ------------------- 第四章共用 SVG 模型與專題控制 -------------------
 const v43R=v41Rect,v43C=v41Circle,v43L=v41Line,v43A=v41Arrow;
 const v43T=(x,y,t,s=15,c='#f8fafc',anchor='middle')=>v41Txt(x,y,t,s,c,anchor);
-const v43H=(key,shape)=>v41Hot(key,shape).replace('<g class="interactive-node"','<g style="pointer-events:bounding-box" class="interactive-node"');
+const v43H=(key,shape)=>v41Hot(key,shape); // 觸控熱區由 V4.4 統一產生，不依賴 Safari 支援度不一的 bounding-box
 const v43ZoneWeights={
  front_head:4.5,front_arm_r:4.5,front_arm_l:4.5,front_trunk:18,front_leg_r:9,front_leg_l:9,front_perineum:1,
  back_head:4.5,back_arm_r:4.5,back_arm_l:4.5,back_trunk:18,back_leg_r:9,back_leg_l:9
@@ -3705,7 +3760,7 @@ function v43SkinLayers(config={}){
  return {b,a,labels,x,y,w,epi,dermis,fat};
 }
 function v43FunctionScene(mode){
- let b='',d='',a='',t='';const base=v43SkinLayers({sectionKeys:{epi:'epidermis',dermis:'epidermis',fat:'epidermis'}});
+ let b='',d='',a='',t='';const base=v43SkinLayers({sectionKeys:{epi:'epidermis',dermis:'dermis',fat:'hypodermis'}});
  b+=base.b;a+=base.a;t+=base.labels;
  b+=v43H('stratum_corneum',v43R(87,127,630,18,'#b77938','#fcd34d',5,2));
  // 真皮感覺：遊離神經末梢、梅氏小體、巴氏小體
@@ -3792,10 +3847,12 @@ function v43TBSAScene(){
   t+=v43T(px,104,front?'正面（前側）':'背面（後側）',18,'#e0f2fe');
   b+=v43BurnZone(`${p}_head`,v43C(px,147,31,fill(`${p}_head`),border,3));
   b+=v43BurnZone(`${p}_trunk`,`<path d="M${px-48} 189 L${px+48} 189 L${px+42} 310 L${px-42} 310 Z" fill="${fill(`${p}_trunk`)}" stroke="${border}" stroke-width="3"/>`);
-  b+=v43BurnZone(`${p}_arm_r`,`<path d="M${px-51} 192 L${px-77} 197 L${px-99} 301 L${px-76} 307 Z" fill="${fill(`${p}_arm_r`)}" stroke="${border}" stroke-width="3"/>`);
-  b+=v43BurnZone(`${p}_arm_l`,`<path d="M${px+51} 192 L${px+77} 197 L${px+99} 301 L${px+76} 307 Z" fill="${fill(`${p}_arm_l`)}" stroke="${border}" stroke-width="3"/>`);
-  b+=v43BurnZone(`${p}_leg_r`,`<path d="M${px-43} 314 L${px-4} 314 L${px-9} 428 L${px-46} 428 Z" fill="${fill(`${p}_leg_r`)}" stroke="${border}" stroke-width="3"/>`);
-  b+=v43BurnZone(`${p}_leg_l`,`<path d="M${px+4} 314 L${px+43} 314 L${px+46} 428 L${px+9} 428 Z" fill="${fill(`${p}_leg_l`)}" stroke="${border}" stroke-width="3"/>`);
+  const viewerLeftArm=`${p}_arm_${front?'r':'l'}`,viewerRightArm=`${p}_arm_${front?'l':'r'}`;
+  const viewerLeftLeg=`${p}_leg_${front?'r':'l'}`,viewerRightLeg=`${p}_leg_${front?'l':'r'}`;
+  b+=v43BurnZone(viewerLeftArm,`<path d="M${px-51} 192 L${px-77} 197 L${px-99} 301 L${px-76} 307 Z" fill="${fill(viewerLeftArm)}" stroke="${border}" stroke-width="3"/>`);
+  b+=v43BurnZone(viewerRightArm,`<path d="M${px+51} 192 L${px+77} 197 L${px+99} 301 L${px+76} 307 Z" fill="${fill(viewerRightArm)}" stroke="${border}" stroke-width="3"/>`);
+  b+=v43BurnZone(viewerLeftLeg,`<path d="M${px-43} 314 L${px-4} 314 L${px-9} 428 L${px-46} 428 Z" fill="${fill(viewerLeftLeg)}" stroke="${border}" stroke-width="3"/>`);
+  b+=v43BurnZone(viewerRightLeg,`<path d="M${px+4} 314 L${px+43} 314 L${px+46} 428 L${px+9} 428 Z" fill="${fill(viewerRightLeg)}" stroke="${border}" stroke-width="3"/>`);
   if(front)b+=v43BurnZone('front_perineum',`<path d="M${px-24} 312 L${px+24} 312 L${px} 336 Z" fill="${fill('front_perineum')}" stroke="${border}" stroke-width="2.5"/>`);
   t+=v43T(px,152,'4.5%',12,'#081827')+v43T(px,252,'18%',19,'#081827')+
      v43T(px-86,252,'4.5%',11,'#081827')+v43T(px+85,252,'4.5%',11,'#081827')+
@@ -4036,6 +4093,7 @@ function v4RenderRoute(nodeId,overrideMode){
 }
 function v4TriggerMode(mode){
  if(!v4ActiveRoute||!v4ActiveRoute.modes.includes(mode))return;
+ if (activeSubMode!==mode){v43Motion=false;document.getElementById('mainSvg').classList.remove('v42-animate','v43-motion');}
  activeSubMode=mode;
  document.querySelectorAll('#subModeBar .sub-btn').forEach(b=>b.classList.toggle('active',b.id==='subBtn-'+mode));
  let info;
@@ -4062,6 +4120,7 @@ function v4TriggerMode(mode){
  if(v4ActiveRoute.engine==='ch4'){const {goal,compare}=V43_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  if(v4ActiveRoute.engine==='ch3'){const {goal,compare}=V42_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  document.getElementById('overviewOT').innerHTML=info.ot;
+ v44DisableUnmappedHotspots();
  const v42VisibleKeys=new Set(Array.from(document.querySelectorAll('#mainSvg .interactive-node[data-key]')).map(x=>x.dataset.key));
  const visibleStructures=['ch3','ch4'].includes(v4ActiveRoute.engine)?Object.fromEntries(Object.entries(v4ActiveRoute.structures).filter(([k])=>v42VisibleKeys.has(k))):v4ActiveRoute.structures;
  renderQuickIndexList(visibleStructures);
@@ -4083,13 +4142,68 @@ function v4RenderDefinition(){
  bg.innerHTML+='<path d="M 215 176 L 215 207 M 215 196 L 222 205 M 215 196 L 208 205" fill="none" stroke="#7dd3fc" stroke-width="3"/>';
  addLabel(labels,55,452,'點選各領域，右側將呈現研究範疇與職能治療應用。',true);
 }
-function v4AnnotateSvgAccessibility(){
- document.querySelectorAll('#mainSvg .interactive-node[data-key]').forEach((el,i)=>{
-  el.setAttribute('tabindex','0');el.setAttribute('role','button');
-  el.setAttribute('aria-label',v4ActiveRoute?.structures?.[el.dataset.key]?.title||el.dataset.key);
-  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(el.dataset.zone){v43ToggleTBSA(el.dataset.zone);}else clickStructureKey(el.dataset.key);}};
+// 第一章共用人體／體腔背景時，保留未選章節的視覺定位，但移除非本節的點擊目標。
+function v44DisableUnmappedHotspots(){
+ const data=v4ActiveRoute?.structures||{};
+ document.querySelectorAll('#mainSvg .interactive-node[data-key]').forEach(el=>{
+  if(Object.hasOwn(data,el.dataset.key))return;
+  el.classList.remove('interactive-node');el.classList.add('v44-context-only');
+  el.removeAttribute('onclick');el.removeAttribute('tabindex');el.removeAttribute('role');el.removeAttribute('data-key');
+  el.setAttribute('aria-hidden','true');el.style.pointerEvents='none';
  });
 }
+
+function v4AnnotateSvgAccessibility(){
+ const visited=new Set();
+ const zoneNames={head:'頭頸',trunk:'軀幹',arm_r:'右上肢',arm_l:'左上肢',leg_r:'右下肢',leg_l:'左下肢',perineum:'會陰'};
+ document.querySelectorAll('#mainSvg .interactive-node[data-key]').forEach(el=>{
+  const identity=el.dataset.zone||el.dataset.key;
+  const duplicated=visited.has(identity);visited.add(identity);
+  el.setAttribute('role','button');
+  if(duplicated){el.removeAttribute('tabindex');el.setAttribute('aria-hidden','true');}
+  else{el.setAttribute('tabindex','0');el.removeAttribute('aria-hidden');}
+  if(el.dataset.zone){
+   const zone=el.dataset.zone,front=zone.startsWith('front_'),name=zoneNames[zone.replace(/^(front|back)_/,'')]||zone;
+   el.setAttribute('aria-label',`${front?'正面':'背面'}${name}，${v43ZoneWeights[zone]}%，${v43Zones[zone]?'已選取':'未選取'}`);
+   el.setAttribute('aria-pressed',String(!!v43Zones[zone]));
+  }else el.setAttribute('aria-label',v4ActiveRoute?.structures?.[el.dataset.key]?.title||el.dataset.key);
+  el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(el.dataset.zone){v43ToggleTBSA(el.dataset.zone);}else clickStructureKey(el.dataset.key);}};
+  v44ImproveHotspot(el);
+ });
+}
+
+// V4.4｜為細線條／微小 SVG 構造建立透明熱區。
+// 實際可見圖形不變；透明區在原始圖形下方，因此點到可見構造仍以原構造優先。
+function v44ImproveHotspot(group){
+ if(!group || !group.ownerSVGElement || group.dataset.zone) return;
+ group.querySelectorAll('.v44-touch-target,.v44-touch-stroke').forEach(x=>x.remove());
+ // Chrome／Safari 都支援的具體圖形元素，不使用 pointer-events:bounding-box。
+ const originals=[...group.querySelectorAll('path,line,polyline')].filter(x=>!x.classList.contains('v44-touch-stroke'));
+ originals.forEach(path=>{
+  const ownFill=path.getAttribute('fill');
+  const isOutline=ownFill==='none' || path.tagName.toLowerCase()==='line' || path.tagName.toLowerCase()==='polyline';
+  if(!isOutline)return;
+  const existingWidth=parseFloat(path.getAttribute('stroke-width')||'1');
+  if(existingWidth>=24)return;
+  const hit=path.cloneNode(false);
+  hit.removeAttribute('id');hit.removeAttribute('class');hit.removeAttribute('style');
+  hit.setAttribute('class','v44-touch-stroke');hit.setAttribute('stroke','transparent');hit.setAttribute('stroke-width',String(Math.max(26,existingWidth)));
+  hit.setAttribute('fill','none');hit.setAttribute('pointer-events','stroke');
+  path.parentNode.insertBefore(hit,path);
+ });
+ try {
+  const b=group.getBBox();
+  if(!Number.isFinite(b.x)||!Number.isFinite(b.y)||b.width<1||b.height<1)return;
+  if(b.width<43||b.height<42){
+   const padX=Math.max(0,(44-b.width)/2),padY=Math.max(0,(44-b.height)/2);
+   const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+   r.setAttribute('class','v44-touch-target');r.setAttribute('x',String(b.x-padX));r.setAttribute('y',String(b.y-padY));
+   r.setAttribute('width',String(b.width+2*padX));r.setAttribute('height',String(b.height+2*padY));
+   r.setAttribute('pointer-events','all');group.insertBefore(r,group.firstChild);
+  }
+ } catch(err) { /* 隱藏節點／不支援 getBBox：保留原本互動，不中斷教材 */ }
+}
+
 function renderQuickIndexList(obj){
  const el=document.getElementById('quickIndexContainer');
  el.innerHTML=Object.entries(obj||{}).map(([key,v])=>`<button class="index-item" id="idxItem-${key}" onclick="clickStructureKey('${key}')"><span class="color-dot" style="background:${v4Esc(v.dot||'#38bdf8')}"></span>${v4Esc(v.shortName||v.title)}</button>`).join('');
@@ -4107,9 +4221,71 @@ function selectStructureItem(data,key){
  document.getElementById('detailOT').innerHTML=data.ot;
  document.querySelectorAll('#mainSvg .interactive-node').forEach(el=>el.classList.toggle('selected',el.dataset.key===key));
  document.querySelectorAll('.index-item').forEach(el=>el.classList.toggle('active',el.id==='idxItem-'+key));
+ if(!V4_NODES[activeNodeId]?.isQuiz && document.getElementById('sceneContext')){
+  document.getElementById('sceneContext').textContent='已選取：'+data.title+'｜請至右側詳解（手機請點「詳解／筆記」）查看說明';
+ }
 }
-function zoomStage(factor){v4Zoom=Math.min(2.6,Math.max(0.7,v4Zoom*factor));document.getElementById('mainSvg').style.transform=`scale(${v4Zoom})`;}
-function resetZoom(){v4Zoom=1;document.getElementById('mainSvg').style.transform='scale(1)';}
+// V4.4｜放大後可拖曳 SVG，避免手機畫面只放大卻無法移動查看。
+let v4PanX=0,v4PanY=0;
+function v44ApplyZoom(){
+ const svg=document.getElementById('mainSvg'),wrap=document.getElementById('svgContainer');
+ svg.style.transform=`translate(${Math.round(v4PanX)}px,${Math.round(v4PanY)}px) scale(${v4Zoom})`;
+ wrap.style.touchAction=v4Zoom>1?'none':'pan-y';
+ wrap.style.cursor=v4Zoom>1?'grab':'default';
+ const ctx=document.getElementById('sceneContext');
+ if(ctx && v4Zoom>1)ctx.title='圖形已放大，可按住圖形拖曳查看其他位置';
+ else if(ctx)ctx.removeAttribute('title');
+}
+function zoomStage(factor){
+ v4Zoom=Math.min(2.6,Math.max(0.7,v4Zoom*factor));
+ if(v4Zoom<=1){v4PanX=0;v4PanY=0;}
+ v44ApplyZoom();
+}
+function resetZoom(){v4Zoom=1;v4PanX=0;v4PanY=0;v44ApplyZoom();}
+function v44InitPanZoom(){
+ const surface=document.getElementById('svgContainer');
+ const touches=new Map();
+ let moved=false,pinchStart=null;
+ surface.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=false;
+  if(touches.size===2){
+   const [a,b]=[...touches.values()];
+   pinchStart={distance:Math.hypot(a.x-b.x,a.y-b.y),zoom:v4Zoom};
+  }
+ });
+ surface.addEventListener('pointermove',e=>{
+  if(!touches.has(e.pointerId))return;
+  const prev=touches.get(e.pointerId);
+  if(touches.size===2&&pinchStart){
+   touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+   const [a,b]=[...touches.values()];
+   if(pinchStart.distance>15){
+    v4Zoom=Math.min(2.6,Math.max(1,pinchStart.zoom*Math.hypot(a.x-b.x,a.y-b.y)/pinchStart.distance));
+    moved=true;v44ApplyZoom();e.preventDefault();
+   }
+   return;
+  }
+  if(v4Zoom>1){
+   const dx=e.clientX-prev.x,dy=e.clientY-prev.y;
+   if(Math.abs(dx)+Math.abs(dy)>1){
+    moved=true;v4PanX+=dx;v4PanY+=dy;
+    // 限制移動距離：保留畫面可回復及操作的區域。
+    const maxX=surface.clientWidth*(v4Zoom-1)/2+surface.clientWidth*.3;
+    const maxY=surface.clientHeight*(v4Zoom-1)/2+surface.clientHeight*.3;
+    v4PanX=Math.max(-maxX,Math.min(maxX,v4PanX));v4PanY=Math.max(-maxY,Math.min(maxY,v4PanY));
+    touches.set(e.pointerId,{x:e.clientX,y:e.clientY});v44ApplyZoom();e.preventDefault();
+   }
+  }
+ });
+ const done=e=>{touches.delete(e.pointerId);if(touches.size<2)pinchStart=null;};
+ surface.addEventListener('pointerup',done);
+ surface.addEventListener('pointercancel',done);
+ surface.addEventListener('lostpointercapture',done);
+ // 拖曳結束不能把原本放手位置誤當成構造點擊。
+ surface.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true);
+}
+
 function setMobileTab(tab){
  if(!['chapters','diagram','explain'].includes(tab))return;
  document.body.dataset.mobileTab=tab;
@@ -4270,6 +4446,7 @@ function v4RenderImageQuestion(){
  document.getElementById('sceneContext').textContent=`🎯 第 ${s.i+1} 題：${q.prompt}（點擊圖形作答）`;
  document.getElementById('v4ImagePrompt').innerHTML=`<strong>第 ${s.i+1} 題／共 ${s.bank.length} 題：</strong>${v4Esc(q.prompt)} <span style="color:#cbd5e1">（已答對 ${s.correct} 題）</span><div class="quiz-progress-line">直接點選中央圖形上的正確構造。</div><div id="v4ImageFeedback"></div>`;
  s.answered=false;
+ v44DisableUnmappedHotspots();
  v4AnnotateSvgAccessibility();
 }
 function v4AnswerImage(key){
@@ -4333,8 +4510,32 @@ function exportStudyBackup(){
   v4Toast('已產生 JSON 備份，請確認檔案儲存位置。');
  }catch(e){alert('備份匯出失敗：'+e.message);}
 }
+
+// V4.4｜資料合併：歷史測驗以內容去重；相同題目的錯題次數累加。
+function v44MergeHistory(a,b){
+ const data=[...(a||[]),...(b||[])],seen=new Set(),result=[];
+ for(const item of data){
+  const fingerprint=JSON.stringify([item.chapter,item.mode,item.total,item.correct,item.time,item.mistakes]);
+  if(seen.has(fingerprint))continue;
+  seen.add(fingerprint);result.push(item);
+ }
+ return result.sort((x,y)=>String(x.time).localeCompare(String(y.time))).slice(-300);
+}
+function v44MergeWrong(a,b){
+ const result={...a};
+ for(const [key,item] of Object.entries(b||{})){
+  const old=result[key];
+  if(!old){result[key]=item;continue;}
+  if(old.count===item.count && old.last===item.last && old.question===item.question)continue; // 相同紀錄重複匯入不加倍
+  const newIsLater=String(item.last||'')>=String(old.last||'');
+  result[key]={count:Math.min(10000,Math.max(0,old.count||0)+Math.max(0,item.count||0)),last:newIsLater?item.last:old.last,related:(newIsLater?item.related:old.related)||'',question:(newIsLater?item.question:old.question)||''};
+ }
+ return result;
+}
+
 async function importStudyBackup(event){
  const input=event.target,file=input.files?.[0];if(!file)return;
+ const previous=v4State;
  try{
   if(file.size>2*1024*1024)throw new Error('備份檔超過 2 MB，請確認是否為本系統備份');
   const obj=JSON.parse(await file.text());
@@ -4344,17 +4545,18 @@ async function importStudyBackup(event){
   const replace=confirm('請選擇匯入方式：\n按「確定」＝以備份覆蓋目前資料\n按「取消」＝合併目前資料與備份（同節筆記採備份內容）');
   if(replace)v4State=safe;
   else{
-   v4State=v4SanitizeState({version:4,notes:{...v4State.notes,...safe.notes},completed:{...v4State.completed,...safe.completed},history:[...v4State.history,...safe.history].slice(-300),wrong:Object.fromEntries([...Object.entries(v4State.wrong),...Object.entries(safe.wrong)].map(([k,v])=>[k,v])),lastNode:v4State.lastNode});
+   v4State=v4SanitizeState({version:4,notes:{...v4State.notes,...safe.notes},completed:{...v4State.completed,...safe.completed},history:v44MergeHistory(v4State.history,safe.history),wrong:v44MergeWrong(v4State.wrong,safe.wrong),lastNode:v4State.lastNode});
   }
   v4SaveState();renderSidebarTree(activeChapter);selectTreeNode(activeNodeId);
   v4Toast('學習備份已匯入，筆記與進度已更新。');
- }catch(e){alert('匯入失敗：'+e.message+'。目前資料未受影響。');}
+ }catch(e){v4State=previous;alert('匯入失敗：'+e.message+'。目前資料未受影響。');}
  finally{input.value='';}
 }
 
 // 統一初始化，避免舊版註冊兩次 DOMContentLoaded 而重複啟動。
 document.addEventListener('DOMContentLoaded',()=>{
  document.getElementById('userNoteInput').addEventListener('input',v4NoteInput);
+ v44InitPanZoom();
  document.getElementById('v4Dashboard').addEventListener('click',e=>{if(e.target.id==='v4Dashboard')closeDashboard();});
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDashboard();});
  v4MigrateLegacyNotes();
