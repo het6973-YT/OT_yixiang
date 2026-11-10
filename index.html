@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新編解剖學：職能治療互動學習系統 V4.4｜四章品質驗收穩定版</title>
+<title>新編解剖學：職能治療互動學習系統 V5.0｜五章整合與圖解字級優化版</title>
 <style>
   :root {
     --bg-dark: #0f172a;
@@ -633,6 +633,12 @@ button:disabled { cursor:not-allowed; }
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
+
+ /* V5.0: 圖解文字按空間調整並維持足夠對比；不影響外部說明文字。 */
+ .v5-font-tools{display:flex;align-items:center;gap:5px;color:#cbd5e1;font-size:.78rem;white-space:nowrap}
+ .v5-font-tools .v4-action{padding:7px 10px;min-width:38px;font-size:.84rem}
+ #mainSvg .node-label,#mainSvg .node-label-dark{paint-order:stroke;stroke-linejoin:round;stroke-width:2px}
+ @media(max-width:1080px){.v5-font-tools{flex:0 0 auto}.v5-font-tools .v4-action{min-height:38px}}
 </style>
 </head>
 <body>
@@ -640,21 +646,23 @@ button:disabled { cursor:not-allowed; }
 <header>
   <div class="brand">
     <h1>📘 新編解剖學：職能治療互動學習系統</h1>
-    <span class="badge">V4.4 四章品質驗收穩定版</span>
+    <span class="badge">V5.0 五章互動整合版</span>
   </div>
   <div class="chapter-tabs">
     <button class="chap-tab active" id="topTab-ch1" onclick="selectChapter('ch1')">第一章：緒論</button>
     <button class="chap-tab" id="topTab-ch2" onclick="selectChapter('ch2')">第二章：基本生物化學與細胞</button>
     <button class="chap-tab" id="topTab-ch3" onclick="selectChapter('ch3')">第三章：組織</button>
     <button class="chap-tab" id="topTab-ch4" onclick="selectChapter('ch4')">第四章：皮膚系統</button>
+    <button class="chap-tab" id="topTab-ch5" onclick="selectChapter('ch5')">第五章：骨骼系統</button>
     <button class="btn-quiz-toggle" id="quizMaskBtn" onclick="toggleQuizMask()">🎯 跑台自測遮罩：關閉</button>
   </div>
 </header>
 
 <div class="learning-toolbar" role="toolbar" aria-label="學習工具列">
-  <button class="v4-pill" id="dashboardOpen" onclick="openDashboard()">📊 學習總覽 <strong id="overallProgress">0/36</strong></button>
-  <span class="toolbar-hint" id="currentLearningLabel">目前教材：第一至四章完整互動教材</span>
+  <button class="v4-pill" id="dashboardOpen" onclick="openDashboard()">📊 學習總覽 <strong id="overallProgress">0/54</strong></button>
+  <span class="toolbar-hint" id="currentLearningLabel">目前教材：第一至五章完整互動教材</span>
   <div class="toolbar-spacer"></div>
+   <div class="v5-font-tools" aria-label="圖解字體尺寸"><span>圖解字體</span><button class="v4-action" type="button" onclick="v5AdjustFont(-1)" title="縮小圖解字體" aria-label="縮小圖解字體">A−</button><button class="v4-action" type="button" onclick="v5AdjustFont(1)" title="放大圖解字體" aria-label="放大圖解字體">A＋</button></div>
   <button class="v4-action" onclick="exportStudyBackup()" title="匯出所有筆記、進度與測驗紀錄">⬇ 備份 JSON</button>
   <button class="v4-action" onclick="document.getElementById('backupFileInput').click()">⬆ 匯入備份</button>
   <input type="file" id="backupFileInput" accept=".json,application/json" hidden onchange="importStudyBackup(event)">
@@ -2411,10 +2419,10 @@ function loadNoteForCurrentNode() {
 // 現有 V3.0 的所有 SVG 繪圖函式與解說資料仍完整保留。
 // ============================================================================
 const V4_STORAGE_KEY = 'OT_ANATOMY_V4_STUDY';
-const V4_NODE_TOTAL = 36;
-const V4_CHAPTERS = ['ch1','ch2','ch3','ch4'];
+const V4_NODE_TOTAL = 54;
+const V4_CHAPTERS = ['ch1','ch2','ch3','ch4','ch5'];
 const V4_CHAPTER_NAMES = {
-  ch1:'第一章 緒論',ch2:'第二章 基本生物化學與細胞',ch3:'第三章 組織',ch4:'第四章 皮膚系統'
+  ch1:'第一章 緒論',ch2:'第二章 基本生物化學與細胞',ch3:'第三章 組織',ch4:'第四章 皮膚系統',ch5:'第五章 骨骼系統'
 };
 
 // 正式目錄的小節一律獨立，章節內的子模式則由 routeRegistry 映射至既有 SVG 引擎。
@@ -2485,6 +2493,39 @@ textbookTree.ch4.nodes = [
   {type:'group',label:'C. 學後測驗'},
   {id:'ch4_quiz',label:'C. 第四章學後測驗',status:'stage3',isQuiz:true}
 ];
+
+
+// V5.0：與既有 V4.4 共用路由與使用者學習資料，完整保留原有四章。
+textbookTree.ch5={title:'📖 第五章 骨骼系統',nodes:[
+  {type:'group',label:"A. 骨骼系統的功能"},
+  {id:'ch5_functions',label:"A. 骨骼系統的功能",status:'done'},
+  {type:'group',label:"B. 骨骼組織"},
+  {id:'ch5_tissue',label:"B. 骨骼組織",status:'done'},
+  {type:'group',label:"C. 骨骼分類"},
+  {id:'ch5_class_region',label:"C-壹. 骨骼的部位分類",status:'done'},
+  {id:'ch5_class_shape',label:"C-貳. 骨骼的外型分類",status:'done'},
+  {type:'group',label:"D. 骨骼巨觀與微觀構造"},
+  {id:'ch5_gross',label:"D-壹. 骨骼的巨觀構造",status:'done'},
+  {id:'ch5_micro',label:"D-貳. 骨骼的微觀構造",status:'done'},
+  {type:'group',label:"E. 骨骼發育、生長與老化"},
+  {id:'ch5_ossification',label:"E-壹. 骨化",status:'done'},
+  {id:'ch5_growth',label:"E-貳. 骨骼的生長",status:'done'},
+  {id:'ch5_homeostasis',label:"E-參. 骨骼的恆定",status:'done'},
+  {id:'ch5_aging',label:"E-肆. 骨骼的老化",status:'done'},
+  {type:'group',label:"F. 骨骼的表面標記"},
+  {id:'ch5_landmarks',label:"F. 骨骼的表面標記",status:'done'},
+  {type:'group',label:"G. 中軸骨骼"},
+  {id:'ch5_skull',label:"G-壹. 頭顱骨",status:'done'},
+  {id:'ch5_spine',label:"G-貳. 脊柱",status:'done'},
+  {id:'ch5_thorax',label:"G-參. 胸廓",status:'done'},
+  {type:'group',label:"H. 附肢骨骼"},
+  {id:'ch5_shoulder',label:"H-壹. 肩帶",status:'done'},
+  {id:'ch5_upper',label:"H-貳. 上肢骨",status:'done'},
+  {id:'ch5_pelvis',label:"H-參. 骨盆帶",status:'done'},
+  {id:'ch5_lower',label:"H-肆. 下肢骨",status:'done'},
+  {type:'group',label:'I. 學後測驗'},
+  {id:'ch5_quiz',label:'I. 第五章學後測驗（40題＋15題圖像辨識）',status:'done',isQuiz:true}
+]};
 
 const V4_NODES = Object.fromEntries(V4_CHAPTERS.flatMap(ch =>
  textbookTree[ch].nodes.filter(n=>n.id).map(n=>[n.id,{...n,chapter:ch}])));
@@ -3976,6 +4017,298 @@ function v43DrawChapterScene(node,mode,imageMode=false){
 }
 
 
+
+// V5.0 第五章骨骼系統 18 節 × 54 種互動檢視模式
+const V5_CONTENT = Object.fromEntries([{"id":"ch5_functions","label":"A. 骨骼系統的功能","group":"A. 骨骼系統的功能","goal":"說明骨骼系統六項重要功能，並連結人體構造與實際活動。","compare":"骨骼提供槓桿與支架，本身不會主動收縮；紅骨髓造血、黃骨髓主要儲脂。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","modes":{"support":{"btn":"支持與保護","title":"A. 骨骼系統｜支持、保護與運動","eng":"Support","desc":"骨骼支持身體重量、維持形狀；顱骨、椎管與胸廓保護腦、脊髓和胸腔臟器；骨骼與肌肉、關節共同形成槓桿系統。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","visual":"skeleton","keys":["skull","vertebra","ribs","limb"]},"marrow":{"btn":"造血與儲脂","title":"A. 骨骼系統｜造血與脂質儲存","eng":"Marrow","desc":"紅骨髓是造血微環境，黃骨髓脂肪比例高；成人紅骨髓主要位於軸骨與部分長骨近端。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","visual":"longbone","keys":["red_marrow","yellow_marrow","compact"]},"mineral":{"btn":"礦物質儲存","title":"A. 骨骼系統｜礦物質恆定","eng":"Mineral","desc":"骨骼儲存大量鈣和磷，骨形成、吸收與激素調節有助於維持血鈣平衡。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","visual":"osteon","keys":["hydroxyapatite","osteoblast","osteoclast"]}},"structures":{"skull":{"title":"顱骨","eng":"Skull","shortName":"顱骨","desc":"顱骨形成堅硬保護性骨盒，維護腦組織。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"vertebra":{"title":"脊柱","eng":"Vertebral column","shortName":"脊柱","desc":"椎骨與椎管支撐軀幹並保護脊髓。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"ribs":{"title":"胸廓","eng":"Thoracic cage","shortName":"胸廓","desc":"胸骨與肋骨包圍胸腔，參與呼吸運動。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"limb":{"title":"四肢長骨","eng":"Limb bones","shortName":"四肢長骨","desc":"提供肌肉附著與施力槓桿。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"red_marrow":{"title":"紅骨髓","eng":"Red bone marrow","shortName":"紅骨髓","desc":"成人部分骨骼內的造血組織，可形成各類血球。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"yellow_marrow":{"title":"黃骨髓","eng":"Yellow bone marrow","shortName":"黃骨髓","desc":"含較多脂肪細胞，主要參與脂質儲存。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"compact":{"title":"緻密骨","eng":"Compact bone","shortName":"緻密骨","desc":"密集礦化骨組織，提供力學強度。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"hydroxyapatite":{"title":"羥磷灰石","eng":"Hydroxyapatite","shortName":"羥磷灰石","desc":"磷酸鈣礦物結晶提升骨骼抗壓硬度。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"osteoblast":{"title":"成骨細胞","eng":"Osteoblast","shortName":"成骨細胞","desc":"製造類骨質並促進骨礦化。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]},"osteoclast":{"title":"破骨細胞","eng":"Osteoclast","shortName":"破骨細胞","desc":"多核細胞，專門吸收舊骨或受損骨質。","ot":"OT分析日常活動時，要同時考量骨骼支撐、肌肉槓桿、姿勢控制及跌倒防護。","tags":["A. 骨骼系統的功能","A. 骨骼系統的功能"]}}},{"id":"ch5_tissue","label":"B. 骨骼組織","group":"B. 骨骼組織","goal":"辨識骨組織的細胞、礦化基質和纖維成分。","compare":"骨的抗拉韌性主要來自第一型膠原；抗壓硬度主要來自無機礦物質。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","modes":{"cells":{"btn":"骨組織細胞","title":"B. 骨骼組織｜四類骨細胞","eng":"Cells","desc":"骨原細胞可分化為成骨細胞；成骨細胞製造骨基質，嵌入基質者成為骨細胞；破骨細胞來自單核吞噬細胞系統，負責骨吸收。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","visual":"cells","keys":["progenitor","osteoblast","osteocyte","osteoclast"]},"matrix":{"btn":"骨基質與礦物","title":"B. 骨骼組織｜有機與無機骨基質","eng":"Matrix","desc":"骨基質含第一型膠原及基質蛋白；礦物主要為羥磷灰石。兩者共同提供抗張與抗壓能力。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","visual":"matrix","keys":["collagen","mineral","osteocyte"]},"remodel":{"btn":"骨形成與吸收","title":"B. 骨骼組織｜骨表面重塑","eng":"Remodel","desc":"骨形成與骨吸收在時空上相互配合，骨細胞感受機械環境並參與調節；示意圖非實際顯微影像。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","visual":"remodel","keys":["osteoblast","osteoclast","osteocyte"]}},"structures":{"progenitor":{"title":"骨原細胞","eng":"Osteogenic progenitor","shortName":"骨原細胞","desc":"可分化為成骨細胞的前驅細胞。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","tags":["B. 骨骼組織","B. 骨骼組織"]},"osteoblast":{"title":"成骨細胞","eng":"Osteoblast","shortName":"成骨細胞","desc":"位於骨表面，分泌類骨質並調節礦化。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","tags":["B. 骨骼組織","B. 骨骼組織"]},"osteocyte":{"title":"骨細胞","eng":"Osteocyte","shortName":"骨細胞","desc":"位於骨陷窩，透過骨小管互相聯繫。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","tags":["B. 骨骼組織","B. 骨骼組織"]},"osteoclast":{"title":"破骨細胞","eng":"Osteoclast","shortName":"破骨細胞","desc":"多核骨吸收細胞，形成吸收凹陷。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","tags":["B. 骨骼組織","B. 骨骼組織"]},"collagen":{"title":"第一型膠原","eng":"Type I collagen","shortName":"第一型膠原","desc":"骨有機基質中重要抗張纖維。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","tags":["B. 骨骼組織","B. 骨骼組織"]},"mineral":{"title":"羥磷灰石","eng":"Hydroxyapatite","shortName":"羥磷灰石","desc":"提供骨骼抗壓硬度的主要礦物。","ot":"骨折修復、漸進負重、肌肉活動與骨重塑的關係是復健重要的生物學基礎。","tags":["B. 骨骼組織","B. 骨骼組織"]}}},{"id":"ch5_class_region","label":"C-壹. 骨骼的部位分類","group":"C. 骨骼分類","goal":"比較中軸與附肢骨骼的範圍及功能。","compare":"標準成人總數206塊；中軸80塊、附肢126塊，個體與年齡可有差異。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","modes":{"axial":{"btn":"中軸骨骼（80塊）","title":"C-壹. 骨骼部位分類｜中軸骨骼","eng":"Axial","desc":"中軸骨骼包括頭顱及相關骨、脊柱、胸廓，構成身體中軸並保護重要器官。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","visual":"skeleton","keys":["skull","vertebra","ribs"]},"appendicular":{"btn":"附肢骨骼（126塊）","title":"C-壹. 骨骼部位分類｜附肢骨骼","eng":"Appendicular","desc":"肩帶及上肢、骨盆帶及下肢構成附肢骨骼，主要參與運動、抓握與移動。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","visual":"skeleton","keys":["shoulder","arm","pelvis","leg"]}},"structures":{"skull":{"title":"頭顱骨","eng":"Skull","shortName":"頭顱骨","desc":"中軸骨骼的頭部骨骼。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","tags":["C. 骨骼分類","C-壹. 骨骼的部位分類"]},"vertebra":{"title":"脊柱","eng":"Vertebral column","shortName":"脊柱","desc":"構成身體縱向支撐軸。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","tags":["C. 骨骼分類","C-壹. 骨骼的部位分類"]},"ribs":{"title":"肋骨與胸骨","eng":"Thoracic cage","shortName":"肋骨與胸骨","desc":"形成胸廓保護心肺。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","tags":["C. 骨骼分類","C-壹. 骨骼的部位分類"]},"shoulder":{"title":"肩帶","eng":"Pectoral girdle","shortName":"肩帶","desc":"鎖骨與肩胛骨連接上肢。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","tags":["C. 骨骼分類","C-壹. 骨骼的部位分類"]},"arm":{"title":"上肢骨","eng":"Upper limb bones","shortName":"上肢骨","desc":"肱骨、橈尺骨及手骨。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","tags":["C. 骨骼分類","C-壹. 骨骼的部位分類"]},"pelvis":{"title":"骨盆帶","eng":"Pelvic girdle","shortName":"骨盆帶","desc":"左右髖骨與薦骨形成骨盆環。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","tags":["C. 骨骼分類","C-壹. 骨骼的部位分類"]},"leg":{"title":"下肢骨","eng":"Lower limb bones","shortName":"下肢骨","desc":"股骨、髕骨、脛腓骨及足骨。","ot":"上肢的功能以操作、精細動作見長，下肢則重視承重、步行與穩定。","tags":["C. 骨骼分類","C-壹. 骨骼的部位分類"]}}},{"id":"ch5_class_shape","label":"C-貳. 骨骼的外型分類","group":"C. 骨骼分類","goal":"依外形辨識長骨、短骨、扁平骨、不規則骨、種子骨。","compare":"骨的外型分類不是依絕對長度；指骨雖短仍屬長骨。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","modes":{"long":{"btn":"長骨","title":"C-貳. 骨骼外型｜長骨","eng":"Long","desc":"長骨的長度大於寬度，典型具有骨幹與兩端骨骺，如股骨、肱骨、指骨。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","visual":"longbone","keys":["epiphysis","diaphysis","cavity"]},"short":{"btn":"短骨","title":"C-貳. 骨骼外型｜短骨","eng":"Short","desc":"短骨大致呈立方狀，常見腕骨、跗骨，可提供穩定並允許有限度的移動。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","visual":"shapes","keys":["carpal","tarsal"]},"flat":{"btn":"扁平骨","title":"C-貳. 骨骼外型｜扁平骨","eng":"Flat","desc":"扁平骨多為薄而略彎曲的骨板，如胸骨、肋骨、肩胛骨及顱蓋骨。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","visual":"shapes","keys":["scapula","sternum"]},"irregular":{"btn":"不規則骨","title":"C-貳. 骨骼外型｜不規則骨","eng":"Irregular","desc":"外形複雜，常見椎骨與部分顏面骨；不能單靠是否長條狀判斷。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","visual":"vertebra","keys":["vertebral_body","spinous"]},"sesamoid":{"btn":"種子骨","title":"C-貳. 骨骼外型｜種子骨","eng":"Sesamoid","desc":"形成於肌腱內，例如髕骨，可改善肌腱力學作用及減少摩擦。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","visual":"leg","keys":["patella","femur"]}},"structures":{"epiphysis":{"title":"骨骺","eng":"Epiphysis","shortName":"骨骺","desc":"長骨末端，常含海綿骨。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"diaphysis":{"title":"骨幹","eng":"Diaphysis","shortName":"骨幹","desc":"長骨中段，外層緻密骨較厚。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"cavity":{"title":"骨髓腔","eng":"Medullary cavity","shortName":"骨髓腔","desc":"長骨骨幹內的主要骨髓空間。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"carpal":{"title":"腕骨","eng":"Carpals","shortName":"腕骨","desc":"八塊腕骨屬短骨的代表。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"tarsal":{"title":"跗骨","eng":"Tarsals","shortName":"跗骨","desc":"七塊跗骨多屬短骨。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"scapula":{"title":"肩胛骨","eng":"Scapula","shortName":"肩胛骨","desc":"扁平骨，提供大量肌肉附著面。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"sternum":{"title":"胸骨","eng":"Sternum","shortName":"胸骨","desc":"位於胸前的扁平骨。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"vertebral_body":{"title":"椎體","eng":"Vertebral body","shortName":"椎體","desc":"椎骨承重的前方部分。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"spinous":{"title":"棘突","eng":"Spinous process","shortName":"棘突","desc":"椎骨向後突出的骨性標記。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"patella":{"title":"髕骨","eng":"Patella","shortName":"髕骨","desc":"最大種子骨，位於股四頭肌腱系統中。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]},"femur":{"title":"股骨","eng":"Femur","shortName":"股骨","desc":"下肢主要長骨。","ot":"肌腱與種子骨的相對位置，對膝伸直機制及活動力學評估有重要意義。","tags":["C. 骨骼分類","C-貳. 骨骼的外型分類"]}}},{"id":"ch5_gross","label":"D-壹. 骨骼的巨觀構造","group":"D. 骨骼巨觀與微觀構造","goal":"從長骨縱切了解骨幹、骨骺、骨膜、骨髓與軟骨。","compare":"關節軟骨位於關節面，不應與骨膜混為一談；成年後生長板多融合形成骨骺線。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","modes":{"long_bone":{"btn":"長骨縱切全覽","title":"D-壹. 長骨的巨觀構造","eng":"Long Bone","desc":"典型長骨具骨幹、近遠端骨骺、緻密骨、海綿骨、骨髓腔、骨膜與關節軟骨。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","visual":"longbone","keys":["epiphysis","diaphysis","compact","spongy","marrow"]},"coverings":{"btn":"骨膜及關節軟骨","title":"D-壹. 骨膜、骨內膜與關節軟骨","eng":"Coverings","desc":"骨膜覆蓋大部分非關節骨表面，富含血管及神經；骨內膜沿內表面分布，關節軟骨覆蓋關節接觸面。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","visual":"longbone","keys":["periosteum","endosteum","cartilage"]},"marrow":{"btn":"骨髓與血管","title":"D-壹. 骨髓腔與骨營養供應","eng":"Marrow","desc":"長骨骨幹腔可有黃骨髓，骨骺海綿骨間隙常含骨髓；營養動脈與骨膜血管提供血液供應。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","visual":"longbone","keys":["marrow","blood_vessel","spongy"]}},"structures":{"epiphysis":{"title":"骨骺","eng":"Epiphysis","shortName":"骨骺","desc":"長骨兩端，關節面附近可見關節軟骨。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"diaphysis":{"title":"骨幹","eng":"Diaphysis","shortName":"骨幹","desc":"長骨中央桿狀區域。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"compact":{"title":"緻密骨","eng":"Compact bone","shortName":"緻密骨","desc":"外層密實骨板，承受負荷。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"spongy":{"title":"海綿骨","eng":"Spongy bone","shortName":"海綿骨","desc":"骨小樑與骨髓空間交錯。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"marrow":{"title":"骨髓","eng":"Bone marrow","shortName":"骨髓","desc":"可有紅骨髓與黃骨髓。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"periosteum":{"title":"骨膜","eng":"Periosteum","shortName":"骨膜","desc":"覆蓋大部分骨外表面，含骨形成相關細胞。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"endosteum":{"title":"骨內膜","eng":"Endosteum","shortName":"骨內膜","desc":"骨髓腔與骨內部表面薄層。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"cartilage":{"title":"關節軟骨","eng":"Articular cartilage","shortName":"關節軟骨","desc":"覆蓋典型滑膜關節骨端表面的透明軟骨。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]},"blood_vessel":{"title":"營養血管","eng":"Nutrient blood vessels","shortName":"營養血管","desc":"經骨的營養孔進入骨內供應組織。","ot":"了解骨膜敏感度、骨髓供血及骨骺損傷，對骨折術後保護與復健有幫助。","tags":["D. 骨骼巨觀與微觀構造","D-壹. 骨骼的巨觀構造"]}}},{"id":"ch5_micro","label":"D-貳. 骨骼的微觀構造","group":"D. 骨骼巨觀與微觀構造","goal":"觀察骨單位、骨板、中央管、骨陷窩與骨小管。","compare":"緻密骨常見骨單位；海綿骨骨小樑通常不具典型同心圓骨單位。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","modes":{"osteon":{"btn":"緻密骨骨單位","title":"D-貳. 微觀構造｜骨單位","eng":"Osteon","desc":"骨單位由同心圓骨板圍繞中央管組成，血管與神經沿中央管經過。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","visual":"osteon","keys":["osteon","central_canal","lamella","lacuna"]},"communication":{"btn":"骨陷窩與骨小管","title":"D-貳. 微觀構造｜骨細胞交通","eng":"Communication","desc":"骨細胞位於骨陷窩內，突起經骨小管與鄰近骨細胞互通。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","visual":"osteon","keys":["lacuna","canaliculi","osteocyte"]},"trabecular":{"btn":"海綿骨骨小樑","title":"D-貳. 微觀構造｜海綿骨","eng":"Trabecular","desc":"海綿骨由薄骨板構成骨小樑網絡，小樑間可有骨髓空間。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","visual":"matrix","keys":["trabecula","marrow_space","lamella"]}},"structures":{"osteon":{"title":"骨單位","eng":"Osteon","shortName":"骨單位","desc":"緻密骨中由同心圓骨板組成的柱狀構造。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]},"central_canal":{"title":"中央管","eng":"Central canal","shortName":"中央管","desc":"骨單位中央的血管與神經通道。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]},"lamella":{"title":"骨板","eng":"Lamella","shortName":"骨板","desc":"層狀礦化骨基質。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]},"lacuna":{"title":"骨陷窩","eng":"Lacuna","shortName":"骨陷窩","desc":"骨細胞所在的小腔隙。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]},"canaliculi":{"title":"骨小管","eng":"Canaliculi","shortName":"骨小管","desc":"連通骨陷窩的微小通道。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]},"osteocyte":{"title":"骨細胞","eng":"Osteocyte","shortName":"骨細胞","desc":"埋入礦化基質的成熟骨細胞。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]},"trabecula":{"title":"骨小樑","eng":"Trabecula","shortName":"骨小樑","desc":"海綿骨中的分枝板梁。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]},"marrow_space":{"title":"骨髓空間","eng":"Marrow space","shortName":"骨髓空間","desc":"骨小樑之間的間隙。","ot":"區分緻密骨和海綿骨的構造，有助理解不同部位骨折和骨質流失的風險。","tags":["D. 骨骼巨觀與微觀構造","D-貳. 骨骼的微觀構造"]}}},{"id":"ch5_ossification","label":"E-壹. 骨化","group":"E. 骨骼發育、生長與老化","goal":"區分膜內骨化與軟骨內骨化的起始組織與過程。","compare":"膜內骨化直接在間葉組織形成骨；軟骨內骨化以透明軟骨模型為基礎。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","modes":{"intramembranous":{"btn":"膜內骨化","title":"E-壹. 骨化｜膜內骨化","eng":"Intramembranous","desc":"間葉細胞分化為成骨細胞，形成骨化中心並分泌類骨質，進一步礦化與形成板層骨；典型見於部分顱骨、鎖骨。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","visual":"ossification","keys":["mesenchyme","osteoblast","woven_bone","lamellar_bone"]},"endochondral":{"btn":"軟骨內骨化","title":"E-壹. 骨化｜軟骨內骨化","eng":"Endochondral","desc":"以透明軟骨模型為起點，形成初級骨化中心、次級骨化中心，長骨生長板保留至骨骼長度生長停止。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","visual":"ossification","keys":["cartilage_model","primary_center","secondary_center","growth_plate"]}},"structures":{"mesenchyme":{"title":"間葉組織","eng":"Mesenchyme","shortName":"間葉組織","desc":"可分化形成骨組織前驅細胞。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]},"osteoblast":{"title":"成骨細胞","eng":"Osteoblast","shortName":"成骨細胞","desc":"分泌類骨質與促進礦化。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]},"woven_bone":{"title":"編織骨","eng":"Woven bone","shortName":"編織骨","desc":"骨形成初期纖維排列較無規律的骨質。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]},"lamellar_bone":{"title":"板層骨","eng":"Lamellar bone","shortName":"板層骨","desc":"成熟後排列較有序的骨組織。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]},"cartilage_model":{"title":"透明軟骨模型","eng":"Hyaline cartilage model","shortName":"透明軟骨模型","desc":"軟骨內骨化的起始模板。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]},"primary_center":{"title":"初級骨化中心","eng":"Primary ossification center","shortName":"初級骨化中心","desc":"典型長骨骨幹最先形成的骨化區。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]},"secondary_center":{"title":"次級骨化中心","eng":"Secondary ossification center","shortName":"次級骨化中心","desc":"通常位於骨骺的後續骨化區。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]},"growth_plate":{"title":"生長板","eng":"Epiphyseal plate","shortName":"生長板","desc":"骨骺與骨幹之間持續長度生長的軟骨區。","ot":"兒童骨骼仍有生長板，傷後復健與負重安排應注意生長板損傷風險。","tags":["E. 骨骼發育、生長與老化","E-壹. 骨化"]}}},{"id":"ch5_growth","label":"E-貳. 骨骼的生長","group":"E. 骨骼發育、生長與老化","goal":"區分長骨長度增長與附加性增厚。","compare":"骨長度增長依靠生長板軟骨增生與骨化；骨直徑增長主要為骨膜側附加性生長。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","modes":{"plate":{"btn":"生長板分區","title":"E-貳. 骨骼生長｜生長板分區","eng":"Plate","desc":"生長板依序可見靜止區、增生區、肥大區、鈣化區及骨化相關區域；示意採五區教學模式。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","visual":"growth","keys":["resting","proliferative","hypertrophic","calcified","ossification_zone"]},"length":{"btn":"長度增長","title":"E-貳. 骨骼生長｜軟骨內骨化與長度增加","eng":"Length","desc":"生長板軟骨細胞增生、肥大並逐步被骨組織取代，使長骨長度增加，最終生長板閉合。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","visual":"longbone","keys":["growth_plate","epiphysis","diaphysis"]},"width":{"btn":"增厚與塑形","title":"E-貳. 骨骼生長｜骨膜附加性生長","eng":"Width","desc":"骨外表面骨膜側成骨細胞沉積新骨，內側可同時發生骨吸收，使直徑增加並調整骨形。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","visual":"remodel","keys":["periosteum","osteoblast","osteoclast"]}},"structures":{"resting":{"title":"靜止區","eng":"Resting zone","shortName":"靜止區","desc":"靠近骨骺側的相對靜止軟骨細胞區。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"proliferative":{"title":"增生區","eng":"Proliferation zone","shortName":"增生區","desc":"軟骨細胞排列成柱狀並進行增生。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"hypertrophic":{"title":"肥大區","eng":"Hypertrophic zone","shortName":"肥大區","desc":"軟骨細胞體積增大。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"calcified":{"title":"鈣化區","eng":"Calcification zone","shortName":"鈣化區","desc":"軟骨基質鈣化，細胞後續凋亡。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"ossification_zone":{"title":"骨化區","eng":"Ossification zone","shortName":"骨化區","desc":"新骨沉積於被保留的鈣化軟骨支架上。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"growth_plate":{"title":"生長板","eng":"Growth plate","shortName":"生長板","desc":"長骨長度增加所依賴的軟骨板。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"epiphysis":{"title":"骨骺","eng":"Epiphysis","shortName":"骨骺","desc":"長骨端部。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"diaphysis":{"title":"骨幹","eng":"Diaphysis","shortName":"骨幹","desc":"長骨中段。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"periosteum":{"title":"骨膜","eng":"Periosteum","shortName":"骨膜","desc":"骨增厚與修復的重要表面組織。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"osteoblast":{"title":"成骨細胞","eng":"Osteoblast","shortName":"成骨細胞","desc":"新增骨基質。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]},"osteoclast":{"title":"破骨細胞","eng":"Osteoclast","shortName":"破骨細胞","desc":"吸收骨質並參與塑形。","ot":"骨骼生長狀態會影響兒童姿勢、活動訓練與副木設計的臨床考量。","tags":["E. 骨骼發育、生長與老化","E-貳. 骨骼的生長"]}}},{"id":"ch5_homeostasis","label":"E-參. 骨骼的恆定","group":"E. 骨骼發育、生長與老化","goal":"說明骨重塑與鈣磷平衡的基本機制。","compare":"血鈣受到副甲狀腺素、維生素D及多器官調節；降鈣素在成人血鈣調節中相對次要。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","modes":{"remodeling":{"btn":"骨重塑循環","title":"E-參. 骨骼恆定｜骨吸收與骨形成","eng":"Remodeling","desc":"破骨細胞吸收舊骨後，成骨細胞形成新骨，最終形成新骨板；重塑有助微損傷修復與組織更新。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","visual":"remodel","keys":["osteoclast","osteoblast","osteocyte"]},"calcium":{"btn":"血鈣恆定","title":"E-參. 骨骼恆定｜鈣與磷平衡","eng":"Calcium","desc":"副甲狀腺素、活性維生素D與腎、腸、骨協同維持鈣磷穩定；血鈣低時可增加骨吸收與腎鈣保留。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","visual":"balance","keys":["pth","vitamin_d","bone_store"]}},"structures":{"osteoclast":{"title":"破骨細胞","eng":"Osteoclast","shortName":"破骨細胞","desc":"溶解礦化基質，進行骨吸收。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","tags":["E. 骨骼發育、生長與老化","E-參. 骨骼的恆定"]},"osteoblast":{"title":"成骨細胞","eng":"Osteoblast","shortName":"成骨細胞","desc":"沉積與礦化新的骨基質。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","tags":["E. 骨骼發育、生長與老化","E-參. 骨骼的恆定"]},"osteocyte":{"title":"骨細胞","eng":"Osteocyte","shortName":"骨細胞","desc":"感測局部力學環境，協調骨代謝訊號。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","tags":["E. 骨骼發育、生長與老化","E-參. 骨骼的恆定"]},"pth":{"title":"副甲狀腺素","eng":"Parathyroid hormone","shortName":"副甲狀腺素","desc":"增加血鈣的調節激素，作用於骨、腎及間接影響腸吸收。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","tags":["E. 骨骼發育、生長與老化","E-參. 骨骼的恆定"]},"vitamin_d":{"title":"活性維生素D","eng":"Calcitriol","shortName":"活性維生素D","desc":"提高腸道鈣與磷吸收。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","tags":["E. 骨骼發育、生長與老化","E-參. 骨骼的恆定"]},"bone_store":{"title":"骨礦物儲存","eng":"Bone mineral reservoir","shortName":"骨礦物儲存","desc":"體內大量鈣磷存於骨礦物中。","ot":"適量負重與運動對維持骨健康有幫助，但須依骨折風險與醫囑調整。","tags":["E. 骨骼發育、生長與老化","E-參. 骨骼的恆定"]}}},{"id":"ch5_aging","label":"E-肆. 骨骼的老化","group":"E. 骨骼發育、生長與老化","goal":"認識骨量變化、骨微結構與骨質疏鬆風險。","compare":"骨質疏鬆不只取決於骨密度，也與微結構及跌倒風險相關。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","modes":{"comparison":{"btn":"年輕與老化骨質","title":"E-肆. 骨骼老化｜骨小樑變化","eng":"Comparison","desc":"老化可能伴隨骨量減少、骨小樑變薄、連接下降、骨皮質變薄；性別、激素、疾病與生活型態都會影響程度。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","visual":"aging","keys":["young_trabecula","aged_trabecula","cortex"]},"fracture":{"btn":"骨質疏鬆與脆弱性骨折","title":"E-肆. 骨骼老化｜骨質疏鬆與骨折","eng":"Fracture","desc":"骨質疏鬆可增加髖部、椎體、遠端橈骨等部位脆弱性骨折風險。圖解只是構造原理，不作個人疾病判定。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","visual":"skeleton","keys":["spine","hip","wrist"]}},"structures":{"young_trabecula":{"title":"較完整骨小樑網","eng":"Intact trabeculae","shortName":"較完整骨小樑網","desc":"小樑相對密集且連接完整。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","tags":["E. 骨骼發育、生長與老化","E-肆. 骨骼的老化"]},"aged_trabecula":{"title":"疏鬆骨小樑網","eng":"Reduced trabeculae","shortName":"疏鬆骨小樑網","desc":"骨量減少可使骨小樑變薄或失去連接。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","tags":["E. 骨骼發育、生長與老化","E-肆. 骨骼的老化"]},"cortex":{"title":"骨皮質","eng":"Cortical bone","shortName":"骨皮質","desc":"老化與部分疾病可使骨皮質厚度下降。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","tags":["E. 骨骼發育、生長與老化","E-肆. 骨骼的老化"]},"spine":{"title":"椎體","eng":"Vertebral bodies","shortName":"椎體","desc":"骨質疏鬆常見脆弱性骨折部位。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","tags":["E. 骨骼發育、生長與老化","E-肆. 骨骼的老化"]},"hip":{"title":"近端股骨","eng":"Proximal femur","shortName":"近端股骨","desc":"老年跌倒相關骨折重要部位。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","tags":["E. 骨骼發育、生長與老化","E-肆. 骨骼的老化"]},"wrist":{"title":"遠端橈骨","eng":"Distal radius","shortName":"遠端橈骨","desc":"跌倒以手撐地時常見骨折部位。","ot":"職能治療可透過跌倒預防、家居環境調整與安全活動策略降低傷害風險。","tags":["E. 骨骼發育、生長與老化","E-肆. 骨骼的老化"]}}},{"id":"ch5_landmarks","label":"F. 骨骼的表面標記","group":"F. 骨骼的表面標記","goal":"辨識骨突、結節、髁、窩、孔等形態術語及位置。","compare":"結節與粗隆多為附著部位；孔、管等多供血管神經通過，窩可以作為關節或構造容納區。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","modes":{"projection":{"btn":"骨突與附著標記","title":"F. 骨骼表面標記｜骨突、棘、粗隆","eng":"Projection","desc":"突起構造有骨突、棘、結節、粗隆及上髁等，常為肌腱、韌帶附著區。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","visual":"landmarks","keys":["spine","tubercle","tuberosity","epicondyle"]},"articular":{"btn":"關節面與凹陷","title":"F. 骨骼表面標記｜髁、頭、窩","eng":"Articular","desc":"髁與骨頭等可為關節面；窩與溝屬凹陷，功能依所在骨骼而定。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","visual":"landmarks","keys":["head","condyle","fossa","groove"]},"passage":{"btn":"骨孔與骨管","title":"F. 骨骼表面標記｜孔、裂與管","eng":"Passage","desc":"骨孔、裂、管是血管神經等結構通道，需注意不同區域有不同具體內容物。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","visual":"landmarks","keys":["foramen","canal"]}},"structures":{"spine":{"title":"骨棘","eng":"Spine","shortName":"骨棘","desc":"尖銳或延伸的骨突起，如肩胛棘。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"tubercle":{"title":"小結節","eng":"Tubercle","shortName":"小結節","desc":"相對較小的圓形隆起。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"tuberosity":{"title":"粗隆","eng":"Tuberosity","shortName":"粗隆","desc":"粗糙且較大的肌腱附著隆起。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"epicondyle":{"title":"上髁","eng":"Epicondyle","shortName":"上髁","desc":"髁附近的骨突出區。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"head":{"title":"骨頭（球狀端）","eng":"Head of bone","shortName":"骨頭（球狀端）","desc":"常有關節面，位於骨頸上。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"condyle":{"title":"髁","eng":"Condyle","shortName":"髁","desc":"圓形的關節突起。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"fossa":{"title":"窩","eng":"Fossa","shortName":"窩","desc":"骨表面較大的凹陷。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"groove":{"title":"溝","eng":"Groove","shortName":"溝","desc":"細長凹槽，供肌腱或其他構造通過。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"foramen":{"title":"孔","eng":"Foramen","shortName":"孔","desc":"骨上開口供神經血管通行。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]},"canal":{"title":"骨管","eng":"Canal","shortName":"骨管","desc":"骨內管狀通道。","ot":"觸診肩峰、肘部上髁、髂前上棘等骨性標記是關節定位與副木設計的重要基礎。","tags":["F. 骨骼的表面標記","F. 骨骼的表面標記"]}}},{"id":"ch5_skull","label":"G-壹. 頭顱骨","group":"G. 中軸骨骼","goal":"區分腦顱骨與顏面骨，辨認重要骨縫及骨孔。","compare":"成人頭顱骨通常22塊（腦顱8、顏面14）；不含舌骨與6塊聽小骨。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","modes":{"front":{"btn":"頭顱正面｜顏面骨","title":"G-壹. 頭顱骨｜顏面骨正面觀","eng":"Front","desc":"顏面骨包括上顎骨、下顎骨、顴骨、鼻骨等；圖示為位置與界線教學示意。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","visual":"skull","keys":["frontal","nasal","zygomatic","maxilla","mandible"]},"side":{"btn":"頭顱側面｜腦顱骨","title":"G-壹. 頭顱骨｜腦顱骨側面觀","eng":"Side","desc":"腦顱骨包含額骨、頂骨、顳骨、枕骨、蝶骨、篩骨；側面可辨認冠狀縫與鱗狀縫等。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","visual":"skull","keys":["frontal","parietal","temporal","occipital","sphenoid"]},"base":{"btn":"顱底與重要骨孔","title":"G-壹. 頭顱骨｜顱底與骨孔","eng":"Base","desc":"枕骨大孔供延髓與脊髓交界通過；其他顱底孔道供不同腦神經與血管通過。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","visual":"skull","keys":["occipital","foramen_magnum","temporal"]}},"structures":{"frontal":{"title":"額骨","eng":"Frontal bone","shortName":"額骨","desc":"形成前額與部分眼眶頂。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"parietal":{"title":"頂骨","eng":"Parietal bone","shortName":"頂骨","desc":"左右成對，構成大部分顱頂。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"temporal":{"title":"顳骨","eng":"Temporal bone","shortName":"顳骨","desc":"位於顱側與顱底，與聽覺和平衡構造相關。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"occipital":{"title":"枕骨","eng":"Occipital bone","shortName":"枕骨","desc":"形成後顱底，含枕骨大孔。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"sphenoid":{"title":"蝶骨","eng":"Sphenoid bone","shortName":"蝶骨","desc":"位於顱底中部，連接多個顱骨。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"nasal":{"title":"鼻骨","eng":"Nasal bone","shortName":"鼻骨","desc":"形成鼻樑上部。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"zygomatic":{"title":"顴骨","eng":"Zygomatic bone","shortName":"顴骨","desc":"構成顴部與眼眶外側。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"maxilla":{"title":"上顎骨","eng":"Maxilla","shortName":"上顎骨","desc":"上排牙齒所在的骨骼，構成上顎。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"mandible":{"title":"下顎骨","eng":"Mandible","shortName":"下顎骨","desc":"唯一具明顯活動性顳顎關節的頭顱骨。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]},"foramen_magnum":{"title":"枕骨大孔","eng":"Foramen magnum","shortName":"枕骨大孔","desc":"枕骨上的大孔，延髓與脊髓於附近連續。","ot":"頭頸部骨性定位與顳顎關節功能，可連結吞嚥、咀嚼及頭部姿勢控制。","tags":["G. 中軸骨骼","G-壹. 頭顱骨"]}}},{"id":"ch5_spine","label":"G-貳. 脊柱","group":"G. 中軸骨骼","goal":"掌握脊柱各區段與典型椎骨構造。","compare":"成人通常7頸椎、12胸椎、5腰椎、薦骨及尾骨；薦尾椎融合程度有個體差異。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","modes":{"regions":{"btn":"脊柱分區","title":"G-貳. 脊柱｜頸胸腰薦尾各區","eng":"Regions","desc":"脊柱包含7節頸椎、12節胸椎、5節腰椎、薦骨與尾骨；成人典型共26塊獨立骨（含薦尾骨各1塊）。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","visual":"spine","keys":["cervical","thoracic","lumbar","sacrum","coccyx"]},"typical":{"btn":"典型椎骨構造","title":"G-貳. 脊柱｜椎體、椎孔與骨突","eng":"Typical","desc":"典型椎骨具有椎體、椎弓、椎孔、棘突、橫突及關節突；相鄰椎孔形成椎管。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","visual":"vertebra","keys":["vertebral_body","vertebral_foramen","spinous","transverse"]},"special":{"btn":"寰椎、樞椎與椎間盤","title":"G-貳. 脊柱｜特殊椎骨與椎間盤","eng":"Special","desc":"寰椎（C1）無典型椎體；樞椎（C2）具齒突；椎間盤由纖維環與髓核構成。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","visual":"vertebra","keys":["atlas","axis","disc"]}},"structures":{"cervical":{"title":"頸椎","eng":"Cervical vertebrae","shortName":"頸椎","desc":"7節，常具橫突孔。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"thoracic":{"title":"胸椎","eng":"Thoracic vertebrae","shortName":"胸椎","desc":"12節，與肋骨形成關節。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"lumbar":{"title":"腰椎","eng":"Lumbar vertebrae","shortName":"腰椎","desc":"5節，椎體較大以承重。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"sacrum":{"title":"薦骨","eng":"Sacrum","shortName":"薦骨","desc":"成年通常由5塊薦椎融合。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"coccyx":{"title":"尾骨","eng":"Coccyx","shortName":"尾骨","desc":"通常由數塊尾椎融合。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"vertebral_body":{"title":"椎體","eng":"Vertebral body","shortName":"椎體","desc":"椎骨前方主要承重構造。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"vertebral_foramen":{"title":"椎孔","eng":"Vertebral foramen","shortName":"椎孔","desc":"椎體後方由椎弓形成的開口。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"spinous":{"title":"棘突","eng":"Spinous process","shortName":"棘突","desc":"向後伸出的骨性突起。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"transverse":{"title":"橫突","eng":"Transverse process","shortName":"橫突","desc":"椎弓兩側突起。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"atlas":{"title":"寰椎（C1）","eng":"Atlas","shortName":"寰椎（C1）","desc":"承托頭顱，無典型椎體。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"axis":{"title":"樞椎（C2）","eng":"Axis","shortName":"樞椎（C2）","desc":"具有齒突，參與頭部旋轉。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]},"disc":{"title":"椎間盤","eng":"Intervertebral disc","shortName":"椎間盤","desc":"椎體間的纖維軟骨構造，吸收部分負荷。","ot":"職能治療的坐姿、移位與背部保護策略，需考量脊柱承重與活動範圍。","tags":["G. 中軸骨骼","G-貳. 脊柱"]}}},{"id":"ch5_thorax","label":"G-參. 胸廓","group":"G. 中軸骨骼","goal":"辨認胸骨、肋骨分類及胸廓與呼吸運動關係。","compare":"真肋1–7對直接經各自肋軟骨連胸骨；假肋8–12對，浮肋11–12對是其中一部分。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","modes":{"cage":{"btn":"胸廓總覽","title":"G-參. 胸廓｜胸骨及12對肋骨","eng":"Cage","desc":"胸廓由胸骨、12對肋骨、肋軟骨及胸椎形成，保護胸腔內器官並參與呼吸。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","visual":"thorax","keys":["sternum","ribs","cartilage"]},"ribs":{"btn":"真肋、假肋與浮肋","title":"G-參. 胸廓｜肋骨分類","eng":"Ribs","desc":"第1–7對真肋直接連至胸骨；第8–10對透過上方肋軟骨間接連至胸骨；第11–12對浮肋前端不附著於胸骨。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","visual":"thorax","keys":["true_ribs","false_ribs","floating_ribs"]},"sternum":{"btn":"胸骨三部分","title":"G-參. 胸廓｜胸骨柄、胸骨體、劍突","eng":"Sternum","desc":"胸骨分胸骨柄、胸骨體與劍突，胸骨角是臨床重要的肋骨定位標記。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","visual":"thorax","keys":["manubrium","body_sternum","xiphoid"]}},"structures":{"sternum":{"title":"胸骨","eng":"Sternum","shortName":"胸骨","desc":"胸部正中前方扁平骨。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"ribs":{"title":"肋骨","eng":"Ribs","shortName":"肋骨","desc":"12對肋骨，後端與胸椎連接。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"cartilage":{"title":"肋軟骨","eng":"Costal cartilages","shortName":"肋軟骨","desc":"將部分肋骨前端連向胸骨。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"true_ribs":{"title":"真肋","eng":"True ribs","shortName":"真肋","desc":"第1–7對，直接與胸骨連接。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"false_ribs":{"title":"假肋","eng":"False ribs","shortName":"假肋","desc":"第8–12對，其中11–12為浮肋。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"floating_ribs":{"title":"浮肋","eng":"Floating ribs","shortName":"浮肋","desc":"第11–12對，前端不連胸骨。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"manubrium":{"title":"胸骨柄","eng":"Manubrium","shortName":"胸骨柄","desc":"胸骨最上部。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"body_sternum":{"title":"胸骨體","eng":"Body of sternum","shortName":"胸骨體","desc":"胸骨中段。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]},"xiphoid":{"title":"劍突","eng":"Xiphoid process","shortName":"劍突","desc":"胸骨最下端，形態可變。","ot":"呼吸節律、胸廓活動與姿勢控制，會共同影響日常活動的耐受度。","tags":["G. 中軸骨骼","G-參. 胸廓"]}}},{"id":"ch5_shoulder","label":"H-壹. 肩帶","group":"H. 附肢骨骼","goal":"辨識鎖骨、肩胛骨與肩胛骨主要骨性標記。","compare":"肩帶由左右鎖骨及肩胛骨組成；肩胛骨不是與胸廓形成典型滑膜關節。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","modes":{"front":{"btn":"鎖骨與肩帶總覽","title":"H-壹. 肩帶｜鎖骨與肩胛骨","eng":"Front","desc":"鎖骨連接胸骨與肩峰，肩胛骨位於胸廓後外側，關節盂與肱骨頭相接。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","visual":"shoulder","keys":["clavicle","scapula","glenoid"]},"back":{"btn":"肩胛骨後面","title":"H-壹. 肩帶｜肩胛棘、肩峰與盂","eng":"Back","desc":"後面可見肩胛棘、肩峰、棘上窩及棘下窩；關節盂位於外側。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","visual":"shoulder","keys":["spine_scapula","acromion","glenoid"]},"front_scapula":{"btn":"肩胛骨前面","title":"H-壹. 肩帶｜肩胛下窩與喙突","eng":"Front Scapula","desc":"肩胛骨前面有肩胛下窩；喙突為重要肌韌帶附著點。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","visual":"shoulder","keys":["subscapular_fossa","coracoid","clavicle"]}},"structures":{"clavicle":{"title":"鎖骨","eng":"Clavicle","shortName":"鎖骨","desc":"S形骨，將上肢力量傳至軀幹。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","tags":["H. 附肢骨骼","H-壹. 肩帶"]},"scapula":{"title":"肩胛骨","eng":"Scapula","shortName":"肩胛骨","desc":"三角形扁平骨，提供肩部肌肉附著。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","tags":["H. 附肢骨骼","H-壹. 肩帶"]},"glenoid":{"title":"關節盂","eng":"Glenoid cavity","shortName":"關節盂","desc":"肩胛骨外側關節面，與肱骨頭相接。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","tags":["H. 附肢骨骼","H-壹. 肩帶"]},"spine_scapula":{"title":"肩胛棘","eng":"Spine of scapula","shortName":"肩胛棘","desc":"肩胛骨後面的顯著骨稜。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","tags":["H. 附肢骨骼","H-壹. 肩帶"]},"acromion":{"title":"肩峰","eng":"Acromion","shortName":"肩峰","desc":"肩胛棘向外延伸形成肩部外側最高骨性標記之一。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","tags":["H. 附肢骨骼","H-壹. 肩帶"]},"subscapular_fossa":{"title":"肩胛下窩","eng":"Subscapular fossa","shortName":"肩胛下窩","desc":"肩胛骨前面較大的凹陷。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","tags":["H. 附肢骨骼","H-壹. 肩帶"]},"coracoid":{"title":"喙突","eng":"Coracoid process","shortName":"喙突","desc":"向前上方突出的鉤狀骨突。","ot":"肩峰、關節盂、喙突、肩胛棘與鎖骨可連結肩部活動分析及副木固定。","tags":["H. 附肢骨骼","H-壹. 肩帶"]}}},{"id":"ch5_upper","label":"H-貳. 上肢骨","group":"H. 附肢骨骼","goal":"辨認肱骨、尺橈骨及手腕手指各骨群。","compare":"前臂標準解剖姿勢下橈骨在外側（拇指側），尺骨在內側（小指側）；腕骨每側8塊。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","modes":{"arm":{"btn":"上臂肱骨","title":"H-貳. 上肢骨｜肱骨","eng":"Arm","desc":"肱骨近端有肱骨頭、大小結節；遠端有肱骨滑車、小頭及內外上髁，與肩肘關節相關。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","visual":"arm","keys":["humerus","humeral_head","epicondyle"]},"forearm":{"btn":"前臂尺骨與橈骨","title":"H-貳. 上肢骨｜尺骨及橈骨","eng":"Forearm","desc":"尺骨近端有鷹嘴與滑車切跡；橈骨近端有橈骨頭，遠端與腕骨關節連接。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","visual":"arm","keys":["radius","ulna","olecranon"]},"hand":{"btn":"手部骨骼放大","title":"H-貳. 上肢骨｜腕骨、掌骨、指骨","eng":"Hand","desc":"每側手共有8腕骨、5掌骨、14指骨；拇指只有2節指骨。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","visual":"hand","keys":["carpals","metacarpals","phalanges"]},"carpals":{"btn":"八塊腕骨辨認","title":"H-貳. 上肢骨｜兩排八塊腕骨","eng":"Carpals","desc":"近端列橈側至尺側為舟狀、月狀、三角、豌豆骨；遠端列為大多角、小多角、頭狀、鉤骨。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","visual":"hand","keys":["scaphoid","lunate","triquetrum","pisiform","trapezium","trapezoid","capitate","hamate"]}},"structures":{"humerus":{"title":"肱骨","eng":"Humerus","shortName":"肱骨","desc":"上臂的長骨。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"humeral_head":{"title":"肱骨頭","eng":"Head of humerus","shortName":"肱骨頭","desc":"肱骨近端球狀關節面。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"epicondyle":{"title":"肱骨上髁","eng":"Epicondyle of humerus","shortName":"肱骨上髁","desc":"肘部重要骨性觸診標記。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"radius":{"title":"橈骨","eng":"Radius","shortName":"橈骨","desc":"標準解剖姿勢下位於前臂外側。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"ulna":{"title":"尺骨","eng":"Ulna","shortName":"尺骨","desc":"標準解剖姿勢下位於前臂內側。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"olecranon":{"title":"鷹嘴","eng":"Olecranon","shortName":"鷹嘴","desc":"尺骨近端突起，形成肘部後方骨性標記。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"carpals":{"title":"腕骨","eng":"Carpals","shortName":"腕骨","desc":"每側8塊，分近端列與遠端列。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"metacarpals":{"title":"掌骨","eng":"Metacarpals","shortName":"掌骨","desc":"每側5塊掌骨。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"phalanges":{"title":"指骨","eng":"Phalanges","shortName":"指骨","desc":"每側14塊，拇指2節、其他手指各3節。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"scaphoid":{"title":"舟狀骨","eng":"Scaphoid","shortName":"舟狀骨","desc":"近端列最外側，臨床常見手腕骨折部位。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"lunate":{"title":"月狀骨","eng":"Lunate","shortName":"月狀骨","desc":"近端列中央偏橈側。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"triquetrum":{"title":"三角骨","eng":"Triquetrum","shortName":"三角骨","desc":"近端列尺側骨。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"pisiform":{"title":"豌豆骨","eng":"Pisiform","shortName":"豌豆骨","desc":"位於三角骨掌側的小種子骨。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"trapezium":{"title":"大多角骨","eng":"Trapezium","shortName":"大多角骨","desc":"遠端列橈側，與第一掌骨形成拇指鞍狀關節。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"trapezoid":{"title":"小多角骨","eng":"Trapezoid","shortName":"小多角骨","desc":"遠端列第二塊，與第二掌骨相關。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"capitate":{"title":"頭狀骨","eng":"Capitate","shortName":"頭狀骨","desc":"遠端列中央的大型腕骨。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]},"hamate":{"title":"鉤骨","eng":"Hamate","shortName":"鉤骨","desc":"遠端列尺側，掌側有鉤。","ot":"職能治療的手部評估、腕骨定位、副木製作與精細抓握功能，尤其依賴上肢骨骼解剖。","tags":["H. 附肢骨骼","H-貳. 上肢骨"]}}},{"id":"ch5_pelvis","label":"H-參. 骨盆帶","group":"H. 附肢骨骼","goal":"辨認髖骨三部分及骨盆骨性標記。","compare":"髖骨由髂骨、坐骨、恥骨融合；薦骨屬中軸骨骼，雖參與骨盆環但不屬附肢骨骼。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","modes":{"overview":{"btn":"骨盆帶總覽","title":"H-參. 骨盆帶｜骨盆環及髖臼","eng":"Overview","desc":"左右髖骨與薦骨共同形成骨盆環；髖臼與股骨頭相接。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","visual":"pelvis","keys":["ilium","ischium","pubis","acetabulum","sacrum"]},"landmarks":{"btn":"骨盆重要標記","title":"H-參. 骨盆帶｜髂前上棘與坐骨粗隆","eng":"Landmarks","desc":"髂前上棘、髂嵴、坐骨粗隆及恥骨聯合是定位與動作分析的重要標記。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","visual":"pelvis","keys":["asis","iliac_crest","ischial_tuberosity","pubic_symphysis"]},"acetabulum":{"btn":"髖臼與髖關節","title":"H-參. 骨盆帶｜髖臼及股骨頭","eng":"Acetabulum","desc":"髖臼由髂骨、坐骨、恥骨組成關節窩，與股骨頭構成髖關節。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","visual":"pelvis","keys":["acetabulum","femoral_head","ischium"]}},"structures":{"ilium":{"title":"髂骨","eng":"Ilium","shortName":"髂骨","desc":"髖骨上方最大部分。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"ischium":{"title":"坐骨","eng":"Ischium","shortName":"坐骨","desc":"髖骨後下部，含坐骨粗隆。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"pubis":{"title":"恥骨","eng":"Pubis","shortName":"恥骨","desc":"髖骨前下部，兩側經恥骨聯合連接。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"acetabulum":{"title":"髖臼","eng":"Acetabulum","shortName":"髖臼","desc":"容納股骨頭的杯狀關節窩。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"sacrum":{"title":"薦骨","eng":"Sacrum","shortName":"薦骨","desc":"屬中軸骨骼，連接左右髖骨。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"asis":{"title":"髂前上棘","eng":"Anterior superior iliac spine","shortName":"髂前上棘","desc":"骨盆前上方可觸及的骨突。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"iliac_crest":{"title":"髂嵴","eng":"Iliac crest","shortName":"髂嵴","desc":"髂骨上緣，為體表重要定位。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"ischial_tuberosity":{"title":"坐骨粗隆","eng":"Ischial tuberosity","shortName":"坐骨粗隆","desc":"坐姿主要承重骨性標記之一。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"pubic_symphysis":{"title":"恥骨聯合","eng":"Pubic symphysis","shortName":"恥骨聯合","desc":"左右恥骨前方聯合處。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]},"femoral_head":{"title":"股骨頭","eng":"Head of femur","shortName":"股骨頭","desc":"與髖臼形成髖關節的球狀關節面。","ot":"坐姿的坐骨粗隆承重、骨盆傾斜與移位技巧，是職能治療的重要臨床應用。","tags":["H. 附肢骨骼","H-參. 骨盆帶"]}}},{"id":"ch5_lower","label":"H-肆. 下肢骨","group":"H. 附肢骨骼","goal":"辨認股骨、膝部、脛腓骨與足骨。","compare":"脛骨在內側、腓骨在外側；每足7跗骨、5蹠骨、14趾骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","modes":{"femur":{"btn":"股骨與髖關節","title":"H-肆. 下肢骨｜股骨","eng":"Femur","desc":"股骨近端有股骨頭、股骨頸、大小轉子，遠端有內外側髁，為人體最長骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","visual":"leg","keys":["femur","femoral_head","greater_trochanter"]},"knee":{"btn":"膝關節與髕骨","title":"H-肆. 下肢骨｜髕骨及膝部","eng":"Knee","desc":"髕骨為最大種子骨，位於股四頭肌腱系統中，改善膝伸直肌群力臂；脛骨平台與股骨髁形成負重關節。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","visual":"leg","keys":["patella","tibia","femur"]},"shank":{"btn":"小腿脛骨與腓骨","title":"H-肆. 下肢骨｜脛骨與腓骨","eng":"Shank","desc":"脛骨為主要承重骨；腓骨位於外側，外踝較內踝遠端。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","visual":"leg","keys":["tibia","fibula","medial_malleolus","lateral_malleolus"]},"foot":{"btn":"足骨放大","title":"H-肆. 下肢骨｜跗骨、蹠骨與趾骨","eng":"Foot","desc":"每足包含7跗骨、5蹠骨、14趾骨；跟骨、距骨與足弓在站立和步行中重要。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","visual":"foot","keys":["talus","calcaneus","tarsals","metatarsals","toes"]}},"structures":{"femur":{"title":"股骨","eng":"Femur","shortName":"股骨","desc":"人體最長骨，主要承重長骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"femoral_head":{"title":"股骨頭","eng":"Head of femur","shortName":"股骨頭","desc":"與髖臼形成髖關節。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"greater_trochanter":{"title":"大轉子","eng":"Greater trochanter","shortName":"大轉子","desc":"股骨近端外側重要肌肉附著點。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"patella":{"title":"髕骨","eng":"Patella","shortName":"髕骨","desc":"膝前側的種子骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"tibia":{"title":"脛骨","eng":"Tibia","shortName":"脛骨","desc":"小腿內側與主要承重骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"fibula":{"title":"腓骨","eng":"Fibula","shortName":"腓骨","desc":"小腿外側較細的長骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"medial_malleolus":{"title":"內踝","eng":"Medial malleolus","shortName":"內踝","desc":"脛骨遠端內側突起。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"lateral_malleolus":{"title":"外踝","eng":"Lateral malleolus","shortName":"外踝","desc":"腓骨遠端外側突起。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"talus":{"title":"距骨","eng":"Talus","shortName":"距骨","desc":"與脛腓骨形成踝關節。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"calcaneus":{"title":"跟骨","eng":"Calcaneus","shortName":"跟骨","desc":"足跟最大跗骨，承受足跟著地負荷。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"tarsals":{"title":"跗骨","eng":"Tarsal bones","shortName":"跗骨","desc":"每足7塊跗骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"metatarsals":{"title":"蹠骨","eng":"Metatarsals","shortName":"蹠骨","desc":"每足5塊蹠骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]},"toes":{"title":"趾骨","eng":"Phalanges of foot","shortName":"趾骨","desc":"每足14塊趾骨。","ot":"下肢承重排列、步態、足弓、跌倒預防與移位訓練均仰賴骨性構造辨識。","tags":["H. 附肢骨骼","H-肆. 下肢骨"]}}}].map(u=>[u.id,u]));
+// V5.0 骨骼系統：原創教學用互動 SVG，專用場景與可用熱區。
+const V5_COLOR=['#7dd3fc','#a78bfa','#34d399','#fbbf24','#fb7185','#93c5fd','#fca5a5','#c4b5fd'];
+function v5Shape(key,svg){return `<g class="interactive-node" data-key="${key}" role="button" onclick="clickStructureKey('${key}')">${svg}</g>`;}
+function v5R(x,y,w,h,fill='#34475a',rx=9,stroke='#cbd5e1',sw=2){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;}
+function v5C(x,y,r,fill='#d6c3a3',stroke='#f1e7d4',sw=2){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;}
+function v5E(x,y,rx,ry,fill='#d6c3a3',stroke='#f1e7d4',sw=2){return `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;}
+function v5P(d,fill='#ddc8a8',stroke='#f5e8d2',width=3){return `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round"/>`;}
+function v5Line(x1,y1,x2,y2,color='#e3cba8',width=11){return `<path d="M${x1} ${y1} L${x2} ${y2}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round"/>`;}
+function v5T(x,y,t,size=17,col='#e0f2fe',anchor='middle'){return v41Txt(x,y,t,size,col,anchor);}
+function v5Label(x,y,t,max=220){const estimated=Array.from(t).reduce((n,ch)=>n+(/[\u3400-\u9fff]/.test(ch)?1:0.62),0);const size=Math.min(18,Math.max(13,Math.floor(max/(estimated||1))));return v5T(x,y,t,size);}
+function v5B(x,y,w=245,h=340){return v5R(x,y,w,h,'#1c3046',16,'#45627c',1.5);}
+function v5Diagram(node,mode){
+ const data=V5_CONTENT[node],part=data.modes[mode],v=part.visual;
+ const focus=new Set(part.keys), col=k=>focus.has(k)?'#fbbf24':'#d1bfa2';
+ let s='',txt='';
+ const add=(key,shape)=>{s+=v5Shape(key,shape);};
+ if(v==='skeleton'){
+  // 多段骨架：頭、胸廓、脊柱、肩帶、骨盆及四肢各有獨立熱點。
+  s+=v5E(286,275,156,184,'#112c41','#38506c',1);
+  add('skull',v5P('M270 104 Q230 110 238 157 Q252 193 278 203 Q306 194 320 160 Q330 112 286 104Z','#d6c7af'));
+  add('vertebra',v5Line(279,205,279,351,'#e9d3a9',15)+Array.from({length:9},(_,i)=>v5Line(265,216+i*15,292,216+i*15,'#bda37e',3)).join(''));
+  add('ribs',Array.from({length:7},(_,i)=>{let y=226+i*15,w=48+i*3;return `<path d="M278 ${y} Q${278-w} ${y-22} ${273-w} ${y+14} M278 ${y} Q${278+w} ${y-22} ${283+w} ${y+14}" fill="none" stroke="${i<3?'#e4cda8':'#d3bd9b'}" stroke-width="8" stroke-linecap="round"/>`;}).join(''));
+  add('shoulder',v5Line(274,208,202,222,'#ceb998',9)+v5Line(282,208,355,222,'#ceb998',9));
+  add('arm',v5Line(204,234,165,307,'#bca784',14)+v5Line(354,234,394,307,'#bca784',14)+v5Line(163,310,140,376,'#bca784',10)+v5Line(168,311,153,378,'#e3cfaa',7)+v5Line(394,309,414,376,'#bca784',10));
+  add('pelvis',v5P('M248 342 Q231 355 241 389 L263 404 L280 383 L298 402 L321 387 Q329 355 309 344 L287 362Z','#cdb898'));
+  add('leg',v5Line(256,395,239,458,'#c8b28f',15)+v5Line(304,395,322,458,'#c8b28f',15));
+  add('hip',v5C(256,394,14,'#fbbf24'));add('wrist',v5C(142,376,10,'#7dd3fc'));
+  s+=v5Line(240,452,220,520,'#e7caa4',11)+v5Line(321,452,340,520,'#e7caa4',11);s+=v5Line(219,520,194,522,'#d9bf9b',10)+v5Line(341,520,363,522,'#d9bf9b',10);s=`<g transform="translate(0,10) scale(1,.84)">${s}</g>`;txt+=v5T(282,92,'人體骨架・前面定位示意',19);
+ } else if(v==='longbone'){
+  s+=v5B(75,94,415,345);
+  add('epiphysis',v5E(286,147,68,39,col('epiphysis'),'#f8e4c0',3)+v5E(286,382,68,39,col('epiphysis'),'#f8e4c0',3));
+  add('diaphysis',v5R(256,164,60,206,col('diaphysis'),14,'#fde7bb',3));
+  add('compact',v5R(267,180,38,174,'#dfc08d',7,'#f8e4be',2));
+  add('marrow',v5R(277,190,18,156,'#e4a73b',7,'#fbca71',1));
+  add('yellow_marrow',v5E(286,277,13,45,'#f59e0b','#fed7aa'));
+  add('red_marrow',v5E(283,145,30,19,'#f472b6','#fecdd3'));
+  add('spongy',Array.from({length:9},(_,i)=>v5Line(255+i%3*30,119+Math.floor(i/3)*16,276+i%3*17,154+Math.floor(i/3)*14,'#f7cc76',4)).join(''));
+  add('cartilage',v5E(285,113,48,9,'#7dd3fc','#a5f3fc'));
+  add('periosteum',v5R(248,165,75,207,'none',11,'#34d399',4));
+  add('endosteum',v5R(272,188,28,161,'none',7,'#a78bfa',3));
+  add('growth_plate',v5R(241,177,89,11,'#fb7185',3));
+  add('blood_vessel',v5P('M360 257 Q328 262 293 282','none','#fb7185',4));
+  add('cavity',v5E(286,278,11,44,'#f59e0b','#fef3c7',1));
+  txt+=v5T(286,464,'長骨縱切・構造與骨髓',18);
+ } else if(v==='cells'||v==='remodel'||v==='matrix'||v==='osteon'||v==='aging'||v==='balance'){
+  s+=v5B(44,99,470,345);
+  if(v==='osteon'){
+   add('osteon',v5C(265,272,140,'#a78b7d','#e2d6bd',3));
+   for(let i=6;i>=1;i--)s+=v5C(265,272,20+i*17,'none',i%2?'#f1cd92':'#c5946e',3);
+   add('central_canal',v5C(265,272,34,'#7f1d1d','#fb7185',4)+v5C(272,265,7,'#38bdf8'));
+   for(let i=0;i<12;i++){let a=i*2*Math.PI/12,r=83,x=265+Math.cos(a)*r,y=272+Math.sin(a)*r;add('lacuna',v5E(x,y,10,5,'#6b4b77','#ddc6ff',1));}
+   add('osteocyte',v5E(362,276,12,8,'#8b5cf6','#d8b4fe',2));
+   add('canaliculi',Array.from({length:12},(_,i)=>{let a=i*Math.PI/6;return v5Line(265+Math.cos(a)*40,272+Math.sin(a)*40,265+Math.cos(a)*72,272+Math.sin(a)*72,'#fde68a',1.8);}).join(''));
+   add('lamella',v5P('M265 155 A117 117 0 0 1 381 273','none','#f9a8d4',7));
+  }else if(v==='aging'){
+   s+=v5T(148,143,'較完整骨小樑',19)+v5T(400,143,'疏鬆骨小樑',19);
+   for(let i=0;i<8;i++){let y=173+i*30;add('young_trabecula',v5Line(80,y,216,y+17,'#f8daa0',12));if(i%2===0)add('aged_trabecula',v5Line(325,y,470,y+24,'#d8ae89',5));}
+   add('cortex',v5R(59,161,12,246,'#e7c58a',4));
+  }else if(v==='balance'){
+   add('pth',v5C(155,232,60,'#7c3aed','#c4b5fd'));
+   add('vitamin_d',v5C(370,232,60,'#0f766e','#6ee7b7'));
+   add('bone_store',v5R(205,330,135,60,'#d6b88b',12,'#fff2cf'));
+   s+=v5Line(211,266,260,330,'#60a5fa',4)+v5Line(320,329,352,269,'#fbbf24',4);
+  }else{
+   add('collagen',Array.from({length:7},(_,i)=>v5P(`M78 ${151+i*35} Q240 ${127+i*29} 473 ${157+i*30}`,'none','#fda4af',9)).join(''));
+   add('mineral',Array.from({length:16},(_,i)=>v5C(95+i%8*51,195+Math.floor(i/8)*100,10,'#fbbf24','#fef08a',1)).join(''));
+   add('trabecula',v5P('M115 378 L205 283 L289 378 L402 268 L469 379','none','#fde68a',13));
+   add('marrow_space',v5C(224,370,18,'#9f1239','#fda4af',1));
+   add('osteocyte',v5E(250,270,22,12,'#a78bfa','#ddd6fe'));
+   add('progenitor',v5E(112,164,27,18,'#8dd3fd','#e0f2fe'));
+   add('osteoblast',v5E(190,177,28,19,'#34d399','#a7f3d0'));
+   add('osteoclast',v5E(365,174,34,22,'#fb7185','#fecdd3'));
+   add('osteoclast',v5E(362,340,32,20,'#fb7185','#fecdd3'));
+  }
+  txt+=v5T(276,464,v==='osteon'?'緻密骨・骨單位':v==='aging'?'骨小樑密度比較':v==='balance'?'鈣磷恆定示意':'骨基質與細胞示意',18);
+ } else if(v==='ossification'||v==='growth'){
+  s+=v5B(45,95,466,346);
+  const keys=v==='growth'?['resting','proliferative','hypertrophic','calcified','ossification_zone']:mode==='intramembranous'?['mesenchyme','osteoblast','woven_bone','lamellar_bone']:['cartilage_model','primary_center','secondary_center','growth_plate'];
+  const names=v==='growth'?['靜止區','增生區','肥大區','鈣化區','骨化區']:mode==='intramembranous'?['間葉','成骨細胞','編織骨','板層骨']:['軟骨模型','初級骨化','次級骨化','生長板'];
+  keys.forEach((key,i)=>{
+   const x=72+i*(keys.length===4?104:86);add(key,v5R(x,177,keys.length===4?91:72,179,V5_COLOR[i],8,'#f1f5f9',2));
+   txt+=v5Label(x+(keys.length===4?45:36),213,names[i],keys.length===4?87:72);
+   for(let n=0;n<6;n++)s+=v5E(x+14+n%2*37,245+Math.floor(n/2)*29,5+(i%3)*2,6+(i%3)*2,'#51476d','#e9d5ff',1);
+   if(i<keys.length-1)s+=v5Line(x+(keys.length===4?92:75),264,x+(keys.length===4?102:84),264,'#fbbf24',4);
+  });
+  if(v==='ossification'){add('osteoblast',v5C(186,383,13,'#34d399'));add('woven_bone',v5R(295,346,45,22,'#fbbf24'));add('lamellar_bone',v5R(364,347,42,22,'#fce7bb'));}
+  txt+=v5T(280,464,'依箭頭觀看構造的階段變化',18);
+ } else if(v==='skull'){
+  s+=v5B(68,95,434,342);
+  if(mode==='base'){
+    add('occipital',v5E(288,268,153,145,'#c8ae8a','#fae5c2',4));
+    add('temporal',v5P('M148 218 Q146 158 233 158 L255 240 L193 301Z','#e6c69b'));
+    add('temporal',v5P('M427 220 Q426 160 339 157 L318 240 L375 302Z','#e6c69b'));
+    add('foramen_magnum',v5E(289,300,56,43,'#172638','#fff2d4',7));
+    add('sphenoid',v5P('M235 175 L340 175 L357 243 L219 243Z','#dbc3a5'));
+    txt+=v5T(287,463,'顱底觀：枕骨大孔位於後顱底',18);
+  }else if(mode==='side'){
+    add('parietal',v5P('M191 159 Q229 92 341 126 Q394 157 396 237 L337 269 L230 231Z','#e4d0ad'));
+    add('frontal',v5P('M192 159 Q218 122 249 122 L245 239 L176 249Z','#f0d8b5'));
+    add('occipital',v5P('M368 191 L401 217 Q426 285 362 349 L322 298Z','#cbb28f'));
+    add('temporal',v5P('M246 237 Q309 229 363 260 L349 320 L264 317Z','#d5b594'));
+    add('sphenoid',v5P('M207 228 L260 224 L278 267 L231 283Z','#c5a179'));
+    add('zygomatic',v5P('M166 270 L233 256 L261 294 L212 309Z','#f4dab5'));
+    add('mandible',v5P('M203 315 L294 317 L316 361 Q256 406 218 365Z','#d6b893'));
+    txt+=v5T(281,463,'側面觀：腦顱及顴弓概念位置',18);
+  }else{
+    add('frontal',v5P('M197 159 Q221 103 342 124 Q369 140 376 190 L365 229 L205 229Z','#e7ccaa'));
+    add('parietal',v5P('M242 116 Q321 102 375 168 L356 215 L310 207Z','#d7bc96'));
+    add('zygomatic',v5P('M196 245 L240 235 L263 290 L207 282Z','#f1d3ac'));
+    add('zygomatic',v5P('M365 244 L325 235 L302 290 L358 282Z','#f1d3ac'));
+    add('nasal',v5P('M273 215 L299 214 L303 267 L267 267Z','#f0dbbc'));
+    add('maxilla',v5P('M240 288 L326 282 L341 345 L225 345Z','#e5c7a0'));
+    add('mandible',v5P('M229 350 L337 350 L333 377 Q282 426 238 380Z','#d6b893'));
+    // 將眼眶以非互動空隙表示；顱底大孔不出現在正面觀。
+    s+=v5E(233,241,26,26,'#162c42','#f4e5cc',3)+v5E(335,241,26,26,'#162c42','#f4e5cc',3);
+    s+=v5P('M279 259 L292 260 L303 284 L267 284Z','#27364a','#f7e7c8',2);
+    txt+=v5T(282,463,'正面觀：額骨、眼眶與顏面骨群',18);
+  }
+ } else if(v==='spine'){
+  s+=v5B(75,94,408,344);
+  for(let i=0;i<20;i++){
+   let y=117+i*15,x=272+Math.round(27*Math.sin((i-2)/6));let k=i<5?'cervical':i<13?'thoracic':i<18?'lumbar':'sacrum';
+   add(k,v5R(x-35,y,70,14,i<5?'#7dd3fc':i<13?'#a78bfa':i<18?'#34d399':'#f59e0b',4,'#0f172a',1));
+  }
+  add('coccyx',v5P('M301 408 L318 417 L305 437Z','#fbbf24'));
+  add('vertebral_body',v5E(282,286,42,35,'#f3ddae'));
+  add('vertebral_foramen',v5C(286,270,17,'#142437','#f3ddae',3));
+  add('spinous',v5P('M286 289 L270 342 L300 342Z','#fef3c7'));
+  add('transverse',v5Line(233,278,337,278,'#fef3c7',9));
+  add('atlas',v5E(282,123,43,16,'none','#7dd3fc',5));
+  add('axis',v5E(278,141,34,11,'#60a5fa','#f5e9d0'));
+  add('disc',v5R(251,339,52,7,'#60a5fa',1));
+  txt+=v5T(280,466,'脊椎分區與典型椎骨概念圖',18);
+ } else if(v==='vertebra'){
+  s+=v5B(75,102,420,327);
+  add('vertebral_body',v5E(278,323,111,76,'#e7ce9f','#fff3d4',4));
+  add('vertebral_foramen',v5E(280,213,67,48,'#0f172a','#f3dfb5',12));
+  add('spinous',v5P('M252 173 Q284 89 312 173 L291 198Z','#d5be99'));
+  add('transverse',v5P('M229 210 L133 187 L146 225 L216 254Z','#d9bd8f')+v5P('M330 210 L424 188 L410 225 L344 255Z','#d9bd8f'));
+  add('atlas',v5E(280,209,100,82,'none','#7dd3fc',7));
+  add('axis',v5P('M270 226 L280 175 L291 225Z','#a78bfa'));
+  add('disc',v5E(280,354,105,25,'#60a5fa','#bde9ff',2));
+  txt+=v5T(281,467,'典型椎骨・上視圖概念示意',18);
+ } else if(v==='thorax'){
+  s+=v5B(70,99,435,338);
+  add('sternum',v5R(278,156,24,218,'#f2d9ab',8));
+  add('manubrium',v5R(271,154,39,48,'#fff1cc',8));add('body_sternum',v5R(279,213,23,124,'#eccb98',6));
+  add('xiphoid',v5P('M283 343 L298 343 L293 385Z','#ffdca9'));
+  for(let i=0;i<12;i++){let y=172+i*15,w=53+i*8,dy=i<7?20:32;const key=i<7?'true_ribs':i<10?'false_ribs':'floating_ribs';
+   add(key,`<path d="M289 ${y} Q${289-w} ${y-18} ${282-w} ${y+dy} M289 ${y} Q${289+w} ${y-18} ${295+w} ${y+dy}" stroke="${i<7?'#f2d9aa':i<10?'#e6bc8c':'#ab9ce6'}" fill="none" stroke-width="${i===11?5:7}" stroke-linecap="round"/>`);
+  }
+  add('cartilage',v5Line(280,243,245,230,'#7dd3fc',5));add('ribs',v5Line(176,230,193,245,'#f8e7c5',9));
+  txt+=v5T(282,467,'前面觀：肋骨與胸骨（示意）',18);
+ } else if(v==='shoulder'){
+  s+=v5B(54,100,460,340);
+  add('scapula',v5P('M221 167 L318 169 L299 365 L189 318Z','#ceb794'));
+  add('clavicle',v5P('M200 143 Q285 117 406 141','none','#f0d4a7',16));
+  if(mode==='back')add('spine_scapula',v5P('M199 224 L311 248','none','#fef3c7',12));
+  add('acromion',v5P('M320 205 Q343 214 355 230','none',mode==='back'?'#fcd34d':'#e7cda6',15));
+  add('glenoid',v5E(319,267,23,32,'#7dd3fc','#e0f2fe',4));
+  add('coracoid',v5P('M286 193 Q310 161 337 180','none','#f59e0b',12));
+  if(mode==='front_scapula')add('subscapular_fossa',v5P('M216 215 L293 227 L284 337 L210 311Z','#34d399','#d1fae5',2));
+  txt+=v5T(285,464,mode==='back'?'肩胛骨後視・肩胛棘':'肩帶骨骼與主要標記',18);
+ } else if(v==='arm'){
+  s+=v5B(70,101,440,333);
+  add('humerus',v5Line(209,178,224,326,'#e8d1ac',22));
+  add('humeral_head',v5C(203,171,28,'#f5e1c3'));
+  add('epicondyle',v5E(224,325,35,20,'#fbbf24','#fef3c7',2));
+  add('radius',v5Line(226,344,246,419,mode==='forearm'?'#38bdf8':'#d8bf9c',14));
+  add('ulna',v5Line(211,346,190,419,mode==='forearm'?'#fbbf24':'#dbc59f',13));
+  add('olecranon',v5E(211,343,17,11,'#fb7185'));
+  s+=v5T(383,193,'肱骨',21)+v5T(387,300,'尺骨／橈骨',19);
+  txt+=v5T(280,463,'上肢長骨・比例簡化圖',18);
+ } else if(v==='hand'||v==='foot'){
+  s+=v5B(60,97,452,342);
+  const isFoot=v==='foot';
+  for(let i=0;i<(isFoot?7:8);i++){
+   let x=159+(i%4)*57,y=166+Math.floor(i/4)*35;
+   const keys=isFoot?['talus','calcaneus','tarsals']:['scaphoid','lunate','triquetrum','pisiform','trapezium','trapezoid','capitate','hamate'];
+   add(keys[i%keys.length],v5R(x,y,50,28,V5_COLOR[i],7,'#eef2ff',2));
+  }
+  for(let i=0;i<5;i++){
+   let x=154+i*58, yy=isFoot?266:257;
+   add(isFoot?'metatarsals':'metacarpals',v5Line(x+12,yy,x+18,yy+78,'#d8be95',12));
+   let segments=i===0?2:3;
+   for(let j=0;j<segments;j++)add(isFoot?'toes':'phalanges',v5R(x+9+j*2,yy+82+j*22,14,18,'#e9d2ae',4));
+  }
+  if(isFoot){add('tarsals',v5E(274,207,102,53,'none','#fbbf24',3));}else if(mode==='carpals'){s+=v5E(274,200,132,65,'none','#34d399',5);}
+  else{add('carpals',v5E(275,184,132,52,'none','#fbbf24',3));}
+  txt+=v5T(287,466,isFoot?'足部 7 跗骨／5 蹠骨／14 趾骨':'手部 8 腕骨／5 掌骨／14 指骨',18);
+ } else if(v==='pelvis'){
+  s+=v5B(58,94,458,344);
+  add('ilium',v5P('M250 192 Q162 138 139 233 Q151 292 241 296 L280 259Z','#e9ca9e'));
+  add('ilium',v5P('M311 192 Q394 136 420 233 Q412 290 323 297 L281 259Z','#e9ca9e'));
+  add('ischium',v5P('M232 280 L266 320 L251 398 L192 359Z','#d0ad88'));
+  add('ischium',v5P('M333 280 L300 322 L315 398 L372 359Z','#d0ad88'));
+  add('pubis',v5P('M256 314 L280 341 L309 315 L339 346 L291 391 L275 386 L220 344Z','#f0d2b1'));
+  add('sacrum',v5P('M268 170 L298 171 L310 293 L277 321 L258 292Z','#9ab2d6'));
+  add('acetabulum',v5C(232,296,22,'#1e293b','#60a5fa',6));
+  add('acetabulum',v5C(333,296,22,'#1e293b','#60a5fa',6));
+  add('femoral_head',v5C(230,298,12,'#c4b5fd'));
+  add('iliac_crest',v5P('M147 234 Q170 152 250 194','none','#fde68a',7));
+  add('asis',v5C(154,241,8,'#fbbf24'));
+  add('ischial_tuberosity',v5C(209,362,13,'#fb7185'));
+  add('pubic_symphysis',v5C(284,374,10,'#fb7185'));
+  txt+=v5T(281,464,'骨盆前視・髖骨及薦骨示意',18);
+ } else if(v==='leg'){
+  s+=v5B(70,96,435,344);
+  add('femur',v5Line(259,161,273,284,'#efdaad',26));
+  add('femoral_head',v5C(229,151,27,'#f1d9b1'));
+  add('greater_trochanter',v5C(282,163,17,'#fbbf24'));
+  add('patella',v5E(269,302,20,15,mode==='knee'?'#fbbf24':'#bda681','#fef3c7')); 
+  add('tibia',v5Line(264,320,249,425,'#d8c09a',21));
+  add('fibula',v5Line(305,320,311,423,mode==='shank'?'#7dd3fc':'#d2b99b',12));
+  add('medial_malleolus',v5C(244,418,12,'#fb7185'));
+  add('lateral_malleolus',v5C(315,428,12,'#fbbf24'));
+  txt+=v5T(281,465,'股骨・膝部・脛腓骨示意',18);
+ } else if(v==='landmarks'){
+  s+=v5B(65,98,445,341);
+  add('head',v5C(263,146,36,'#eee0be'));
+  add('tubercle',v5C(310,175,13,'#fbbf24'));
+  add('tuberosity',v5E(224,282,26,19,'#f472b6'));
+  add('epicondyle',v5E(300,375,22,13,'#60a5fa'));
+  add('condyle',v5E(257,381,38,16,'#d9be99'));
+  add('spine',v5P('M266 186 L245 236 L286 225Z','#fcd34d'));
+  add('fossa',v5E(271,264,40,23,'#334155','#fbbf24',3));
+  add('groove',v5P('M245 310 L260 340','none','#7dd3fc',5));
+  add('foramen',v5C(261,332,13,'#172032','#fde68a',4));
+  add('canal',v5P('M259 236 L260 303','none','#c4b5fd',8));
+  txt+=v5T(281,467,'骨表面起伏之形態術語概念圖',18);
+ } else if(v==='shapes'){
+  s+=v5B(52,100,466,344);
+  add('carpal',v5R(133,167,78,72,'#60a5fa',15));
+  add('tarsal',v5R(266,168,99,65,'#a78bfa',16));
+  add('scapula',v5P('M138 291 L223 285 L179 398Z','#fbbf24'));
+  add('sternum',v5R(305,281,39,125,'#34d399',12));
+  txt+=v5T(280,465,'外形分類：短骨／扁平骨',18);
+ }else{s+=v5B(65,105,445,325);}
+ return {shapes:s,labels:txt};
+}
+function v5RenderScene(node,mode,imageMode=false){
+ const info=V5_CONTENT[node],sc=info?.modes[mode];if(!sc)return;
+ v41Base('');
+ const shell=document.getElementById('layer-bg');
+ shell.innerHTML=v5R(12,10,774,478,'#152438',19,'#4a6c88',2)+v5Line(29,78,770,78,'#38536d',2);
+ const activeKeys=sc.keys.filter(k=>info.structures[k]);
+ const dr=v5Diagram(node,mode);
+ document.getElementById('layer-1').innerHTML=dr.shapes;
+ // 右側構造索引是圖解的一部分；僅列本模式的構造，不顯示不存在的熱區。
+ let legend=v5R(534,101,246,351,'#203247',14,'#526982',1.5)+v5T(654,135,'本模式重要構造',21,'#f8fafc');
+ const items=activeKeys.slice(0,8);
+ const spacing=Math.min(54,Math.floor(285/Math.max(1,items.length)));
+ items.forEach((key,i)=>{
+  let y=151+i*spacing;const name=info.structures[key].title;
+  legend+=v5Shape(key,v5R(547,y,220,Math.min(38,spacing-5),i%2?'#33465d':'#30425a',8,'#607b91',1));
+  legend+=v5Label(657,y+Math.min(26,spacing-10),name,202);
+ });
+ document.getElementById('layer-2').innerHTML=legend;
+ const title=sc.title.split('｜').slice(-1)[0];
+ document.getElementById('layer-labels').innerHTML=v5T(31,52,title,23,'#e0f2fe','start')+dr.labels;
+ document.getElementById('layerControlsBar').innerHTML='<span style="color:var(--text-muted)">👁️ 圖層：</span><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer(\'layer-labels\',this.checked)"> 圖中文字</label><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer(\'layer-2\',this.checked)"> 構造索引</label><span class="v41-control-label">點選骨骼／索引查看完整詳解</span>';
+ const svg=document.getElementById('mainSvg');svg.setAttribute('viewBox','0 0 800 500');svg.classList.toggle('quiz-hidden',imageMode||quizMaskActive);
+ v4AnnotateSvgAccessibility();
+}
+
+
+for(const [id,item] of Object.entries(V5_CONTENT)){
+ const keys=Object.keys(item.modes);
+ V4_ROUTES[id]={engine:'ch5',modes:keys,start:keys[0],structures:item.structures,theme:'theme-anatomical'};
+}
+V4_QUIZ_BANKS.ch5 = [{"related":"ch5_functions","q":"骨骼系統的哪一項功能最直接與紅骨髓相關？","opts":["血球生成","甲狀腺激素分泌","膽汁合成","腸道蠕動"],"ans":0,"exp":"紅骨髓含造血幹細胞與支持微環境，可產生血球。"},{"related":"ch5_functions","q":"下列何者最適合說明骨骼在人體運動中的角色？","opts":["作為肌肉拉動的槓桿","自行收縮產生動力","直接傳導神經動作電位","主動分泌滑液"],"ans":0,"exp":"骨骼透過關節及肌肉牽引產生運動，本身不主動收縮。"},{"related":"ch5_functions","q":"骨骼中含量豐富、與骨礦物質儲存最相關的元素為何？","opts":["鈣與磷","鐵與碘","鈉與氯","碳與氮"],"ans":0,"exp":"骨中的羥磷灰石主要含磷酸鈣。"},{"related":"ch5_tissue","q":"主要製造類骨質（osteoid）的細胞為何？","opts":["成骨細胞","破骨細胞","紅血球","軟骨細胞"],"ans":0,"exp":"成骨細胞分泌含第一型膠原的類骨質，進一步礦化。"},{"related":"ch5_tissue","q":"下列哪種細胞最直接負責骨吸收？","opts":["破骨細胞","成骨細胞","骨原細胞","骨髓脂肪細胞"],"ans":0,"exp":"破骨細胞為多核細胞，能酸化並分解礦化骨基質。"},{"related":"ch5_tissue","q":"骨基質中的第一型膠原主要提供什麼性質？","opts":["抗張韌性","電傳導能力","神經髓鞘","血液氧運輸"],"ans":0,"exp":"膠原提供抗拉的韌性，礦物質提供主要硬度。"},{"related":"ch5_class_region","q":"標準成人骨骼的中軸骨骼通常約有多少塊？","opts":["80塊","126塊","206塊","22塊"],"ans":0,"exp":"成人骨骼通常206塊，中軸80塊、附肢126塊。"},{"related":"ch5_class_region","q":"下列何者屬於附肢骨骼？","opts":["肩胛骨","胸骨","顱頂骨","胸椎"],"ans":0,"exp":"肩帶骨骼含鎖骨、肩胛骨，屬附肢骨骼。"},{"related":"ch5_class_shape","q":"指骨依骨骼外型分類應屬何者？","opts":["長骨","短骨","扁平骨","不規則骨"],"ans":0,"exp":"長骨以長度相對寬度的外形特徵分類，並不以絕對尺寸分類。"},{"related":"ch5_class_shape","q":"髕骨最典型的外型分類為何？","opts":["種子骨","短骨","不規則骨","扁平骨"],"ans":0,"exp":"髕骨位於股四頭肌腱系統中，是人體最大的種子骨。"},{"related":"ch5_class_shape","q":"椎骨通常屬於哪類外形？","opts":["不規則骨","長骨","短骨","種子骨"],"ans":0,"exp":"椎骨外形複雜，屬不規則骨。"},{"related":"ch5_gross","q":"覆蓋多數骨外表面，富含神經與血管的構造是？","opts":["骨膜","關節軟骨","骨髓腔","骨陷窩"],"ans":0,"exp":"骨膜覆蓋非關節面的骨外表面，對生長與修復重要。"},{"related":"ch5_gross","q":"長骨關節端覆蓋的主要軟骨種類為何？","opts":["透明軟骨","彈性軟骨","纖維軟骨","骨板"],"ans":0,"exp":"多數滑膜關節的關節軟骨是透明軟骨。"},{"related":"ch5_gross","q":"骨幹中央主要容納骨髓的空間稱為？","opts":["骨髓腔","骨小管","中央管","關節盂"],"ans":0,"exp":"典型長骨骨幹內有骨髓腔，常含黃骨髓。"},{"related":"ch5_micro","q":"緻密骨骨單位中心的管道為何？","opts":["中央管（哈氏管）","椎孔","腕骨管","鼻淚管"],"ans":0,"exp":"骨單位中央管可含微血管與神經。"},{"related":"ch5_micro","q":"骨細胞位於骨基質中的哪個微小空間？","opts":["骨陷窩","骨膜","骨骺線","營養孔"],"ans":0,"exp":"骨陷窩容納骨細胞，骨小管可讓細胞間互通。"},{"related":"ch5_micro","q":"關於海綿骨的描述何者正確？","opts":["以骨小樑網絡為主","每個骨小樑均有典型完整骨單位","完全沒有血液供應","只出現在骨幹外層"],"ans":0,"exp":"海綿骨主要為骨小樑及骨髓空間，通常不具典型同心圓骨單位。"},{"related":"ch5_ossification","q":"下列何者較典型地經膜內骨化形成？","opts":["部分顱蓋骨","股骨骨幹大部分","脛骨長度生長板","一般長骨初期軟骨模型"],"ans":0,"exp":"膜內骨化從間葉組織直接形成骨；長骨多以軟骨內骨化為主。"},{"related":"ch5_ossification","q":"軟骨內骨化首先使用何種模型？","opts":["透明軟骨","彈性軟骨","成熟緻密骨","成層角質上皮"],"ans":0,"exp":"典型長骨以透明軟骨模型為骨化的基礎。"},{"related":"ch5_growth","q":"長骨增加長度最直接依賴哪個構造？","opts":["骨骺生長板","骨膜外側表面","骨髓腔脂肪","骨中央管"],"ans":0,"exp":"生長板軟骨增生並被新骨取代，使長骨伸長。"},{"related":"ch5_growth","q":"骨骼直徑增厚主要與何種生長有關？","opts":["骨膜附加性生長","神經軸突再生","表皮角質形成","紅血球增生"],"ans":0,"exp":"骨膜側成骨細胞沉積新骨，內部可同時發生吸收。"},{"related":"ch5_growth","q":"生長板軟骨細胞排列成縱向柱列的區域是？","opts":["增生區","骨膜外層","骨髓腔","關節囊"],"ans":0,"exp":"增生區細胞分裂與柱狀排列促進長度增長。"},{"related":"ch5_homeostasis","q":"何者是骨重塑時主要負責骨形成的細胞？","opts":["成骨細胞","破骨細胞","嗜中性球","軟骨內皮細胞"],"ans":0,"exp":"成骨細胞製造新類骨質，與破骨細胞吸收共同形成重塑循環。"},{"related":"ch5_homeostasis","q":"在血鈣偏低時，哪一激素有助於提高血鈣？","opts":["副甲狀腺素","胰島素","褪黑激素","催產素"],"ans":0,"exp":"副甲狀腺素參與腎臟鈣保留與骨鈣調節，並間接促進腸道鈣吸收。"},{"related":"ch5_aging","q":"骨質疏鬆常增加下列哪種骨折風險？","opts":["脆弱性髖部骨折","耳廓軟骨撕裂","指甲生長異常","腱鞘囊腫"],"ans":0,"exp":"骨質疏鬆會增加椎體、髖部與遠端橈骨等部位的骨折風險。"},{"related":"ch5_aging","q":"下列何者屬於骨骼老化可能出現的微觀改變？","opts":["骨小樑變薄、連接減少","所有骨板完全消失","骨密度必然逐年增加","成年後不再發生骨重塑"],"ans":0,"exp":"部分個體隨老化骨小樑減少、皮質骨變薄，但差異受健康與生活型態影響。"},{"related":"ch5_landmarks","q":"骨表面供血管神經通過的開口一般稱為？","opts":["孔（foramen）","髁（condyle）","粗隆（tuberosity）","棘（spine）"],"ans":0,"exp":"Foramen 為骨孔，常供血管、神經穿越。"},{"related":"ch5_landmarks","q":"肩峰較接近下列哪種骨骼表面標記？","opts":["骨突","骨髓腔","骨陷窩","骨小樑"],"ans":0,"exp":"肩峰是肩胛棘向外延伸的骨突起。"},{"related":"ch5_skull","q":"成人頭顱骨（不含聽小骨與舌骨）通常共幾塊？","opts":["22塊","8塊","14塊","29塊"],"ans":0,"exp":"成人頭顱骨典型共22塊，其中腦顱8、顏面14。"},{"related":"ch5_skull","q":"枕骨大孔主要位於哪塊骨？","opts":["枕骨","額骨","上顎骨","顴骨"],"ans":0,"exp":"枕骨大孔位於顱底枕骨，鄰近延髓與脊髓交界。"},{"related":"ch5_spine","q":"成人典型胸椎有多少節？","opts":["12節","7節","5節","10節"],"ans":0,"exp":"典型脊柱有頸椎7節、胸椎12節、腰椎5節。"},{"related":"ch5_spine","q":"樞椎（C2）的特色構造為何？","opts":["齒突","髖臼","鷹嘴","關節盂"],"ans":0,"exp":"C2具齒突，參與寰樞關節轉動。"},{"related":"ch5_thorax","q":"哪一組肋骨屬浮肋？","opts":["第11–12對","第1–2對","第5–7對","第8–10對"],"ans":0,"exp":"第11與12對前端不連胸骨，屬浮肋。"},{"related":"ch5_thorax","q":"胸骨由上而下依序通常分為？","opts":["胸骨柄、胸骨體、劍突","劍突、胸骨體、胸骨柄","鎖骨、肩峰、胸骨體","胸骨柄、肋骨、劍突"],"ans":0,"exp":"胸骨上方為胸骨柄，中段胸骨體，下端劍突。"},{"related":"ch5_shoulder","q":"肩胛骨外側與肱骨頭接合的部位為？","opts":["關節盂","肩胛棘","喙突","肩胛下窩"],"ans":0,"exp":"肩胛骨外側關節盂與肱骨頭形成肩關節。"},{"related":"ch5_shoulder","q":"肩胛棘向外側延伸形成哪個構造？","opts":["肩峰","喙突","坐骨粗隆","骨骺線"],"ans":0,"exp":"肩峰是肩胛棘外側的骨性延伸。"},{"related":"ch5_upper","q":"標準解剖學姿勢下，前臂外側的骨骼是？","opts":["橈骨","尺骨","肱骨","腕骨"],"ans":0,"exp":"橈骨位於拇指側，尺骨位於小指側。"},{"related":"ch5_upper","q":"單側手部通常有幾塊腕骨？","opts":["8塊","7塊","5塊","14塊"],"ans":0,"exp":"腕骨每側8塊，分近端列和遠端列。"},{"related":"ch5_pelvis","q":"下列何者不屬於髖骨三部分之一？","opts":["薦骨","髂骨","坐骨","恥骨"],"ans":0,"exp":"髖骨由髂、坐、恥三部分融合；薦骨屬中軸骨骼。"},{"related":"ch5_lower","q":"關於脛骨與腓骨的敘述何者正確？","opts":["脛骨位內側且主要承重","腓骨位內側且主要承重","脛骨是上臂長骨","腓骨構成髕骨"],"ans":0,"exp":"在標準解剖姿勢下脛骨在內側，為小腿主要承重骨。"}];
+V4_IMAGE_QUESTIONS.ch5=[
+ {scene:'ch5_functions',mode:'support',target:'skull',prompt:'請點選保護腦部的「顱骨」。'},
+ {scene:'ch5_functions',mode:'marrow',target:'red_marrow',prompt:'請點選「紅骨髓」。'},
+ {scene:'ch5_tissue',mode:'cells',target:'osteoblast',prompt:'請點選負責形成骨基質的「成骨細胞」。'},
+ {scene:'ch5_class_region',mode:'axial',target:'vertebra',prompt:'請點選位於身體中軸的「脊柱」。'},
+ {scene:'ch5_class_shape',mode:'sesamoid',target:'patella',prompt:'請點選種子骨「髕骨」。'},
+ {scene:'ch5_gross',mode:'long_bone',target:'diaphysis',prompt:'請點選長骨中段的「骨幹」。'},
+ {scene:'ch5_micro',mode:'osteon',target:'central_canal',prompt:'請點選骨單位中央的「中央管」。'},
+ {scene:'ch5_growth',mode:'plate',target:'proliferative',prompt:'請點選生長板的「增生區」。'},
+ {scene:'ch5_skull',mode:'front',target:'mandible',prompt:'請點選顏面骨中的「下顎骨」。'},
+ {scene:'ch5_spine',mode:'regions',target:'lumbar',prompt:'請點選「腰椎」。'},
+ {scene:'ch5_thorax',mode:'sternum',target:'xiphoid',prompt:'請點選胸骨最下端的「劍突」。'},
+ {scene:'ch5_shoulder',mode:'back',target:'acromion',prompt:'請點選肩胛骨外側的「肩峰」。'},
+ {scene:'ch5_upper',mode:'forearm',target:'radius',prompt:'請點選前臂外側的「橈骨」。'},
+ {scene:'ch5_pelvis',mode:'overview',target:'acetabulum',prompt:'請點選「髖臼」。'},
+ {scene:'ch5_lower',mode:'shank',target:'fibula',prompt:'請點選小腿外側的「腓骨」。'}
+];
+
 function v4DefaultState(){return {version:4,notes:{},completed:{},history:[],wrong:{},lastNode:'ch1_definition'};}
 let v4StorageAvailable = true;
 function v4ReadState(){
@@ -3986,8 +4319,8 @@ function v4SanitizeState(val){
  const def=v4DefaultState(); if(!val||typeof val!=='object')return def;
  const notes={};for(const [k,v] of Object.entries(val.notes||{})){if(V4_NODES[k]&&typeof v==='string')notes[k]=v.slice(0,30000);}
  const completed={};for(const [k,v] of Object.entries(val.completed||{})){if(V4_IMPLEMENTED.includes(k)&&v===true)completed[k]=true;}
- const history=Array.isArray(val.history)?val.history.filter(x=>x&&['ch1','ch2','ch3','ch4'].includes(x.chapter)&&['practice','exam','image'].includes(x.mode)&&Number.isFinite(x.total)&&Number.isFinite(x.correct)&&x.total>0&&x.correct>=0&&x.correct<=x.total).slice(-300).map(x=>({chapter:x.chapter,mode:x.mode,total:x.total,correct:x.correct,time:String(x.time||'').slice(0,40),mistakes:Array.isArray(x.mistakes)?x.mistakes.map(String).slice(0,100):[]})):[];
- const wrong={};for(const [k,v] of Object.entries(val.wrong||{})){if(/^ch[1234]_(?:t|img)_\d+$/.test(k)&&v&&typeof v==='object')wrong[k]={count:Math.min(Math.max(Number(v.count)||0,0),10000),last:String(v.last||'').slice(0,40),related:V4_NODES[v.related]?v.related:'',question:String(v.question||'').slice(0,600)};}
+ const history=Array.isArray(val.history)?val.history.filter(x=>x&&['ch1','ch2','ch3','ch4','ch5'].includes(x.chapter)&&['practice','exam','image'].includes(x.mode)&&Number.isFinite(x.total)&&Number.isFinite(x.correct)&&x.total>0&&x.correct>=0&&x.correct<=x.total).slice(-300).map(x=>({chapter:x.chapter,mode:x.mode,total:x.total,correct:x.correct,time:String(x.time||'').slice(0,40),mistakes:Array.isArray(x.mistakes)?x.mistakes.map(String).slice(0,100):[]})):[];
+ const wrong={};for(const [k,v] of Object.entries(val.wrong||{})){if(/^ch[12345]_(?:t|img)_\d+$/.test(k)&&v&&typeof v==='object')wrong[k]={count:Math.min(Math.max(Number(v.count)||0,0),10000),last:String(v.last||'').slice(0,40),related:V4_NODES[v.related]?v.related:'',question:String(v.question||'').slice(0,600)};}
  return {version:4,notes,completed,history,wrong,lastNode:V4_NODES[val.lastNode]?val.lastNode:def.lastNode};
 }
 let v4State=v4ReadState();
@@ -4086,7 +4419,7 @@ function v4RenderRoute(nodeId,overrideMode){
  const route=V4_ROUTES[nodeId];if(!route)return;
  v4ActiveRoute=route;
  document.getElementById('svgContainer').className='svg-wrapper '+route.theme;
- const modes=route.engine==='ch4'?V43_CONTENT[nodeId].modes:route.engine==='ch3'?V42_CONTENT[nodeId].modes:route.engine==='ch2'?V41_CONTENT[nodeId].modes:route.engine==='definition'?v4DefinitionMode:route.engine==='ch1'?ch1Data[route.source].subModes:route.engine==='ct'?ctModes:epiModes;
+ const modes=route.engine==='ch5'?V5_CONTENT[nodeId].modes:route.engine==='ch4'?V43_CONTENT[nodeId].modes:route.engine==='ch3'?V42_CONTENT[nodeId].modes:route.engine==='ch2'?V41_CONTENT[nodeId].modes:route.engine==='definition'?v4DefinitionMode:route.engine==='ch1'?ch1Data[route.source].subModes:route.engine==='ct'?ctModes:epiModes;
  const bar=document.getElementById('subModeBar');
  bar.innerHTML='<div class="submode-title">📂 本節互動檢視模式</div>'+route.modes.map(k=>`<button class="sub-btn" id="subBtn-${k}" onclick="v4TriggerMode('${k}')">${v4Esc(modes[k].btn)}</button>`).join('');
  v4TriggerMode(overrideMode&&route.modes.includes(overrideMode)?overrideMode:route.start);
@@ -4097,7 +4430,8 @@ function v4TriggerMode(mode){
  activeSubMode=mode;
  document.querySelectorAll('#subModeBar .sub-btn').forEach(b=>b.classList.toggle('active',b.id==='subBtn-'+mode));
  let info;
- if(v4ActiveRoute.engine==='ch4'){info=V43_CONTENT[activeNodeId].modes[mode];v43DrawChapterScene(activeNodeId,mode);}
+ if(v4ActiveRoute.engine==='ch5'){info=V5_CONTENT[activeNodeId].modes[mode];v5RenderScene(activeNodeId,mode);}
+ else if(v4ActiveRoute.engine==='ch4'){info=V43_CONTENT[activeNodeId].modes[mode];v43DrawChapterScene(activeNodeId,mode);}
  else if(v4ActiveRoute.engine==='ch3'){info=V42_CONTENT[activeNodeId].modes[mode];v42RenderScene(activeNodeId,mode);}
  else if(v4ActiveRoute.engine==='ch2'){info=V41_CONTENT[activeNodeId].modes[mode];v41RenderCh2Scene(activeNodeId,mode);}
  else if(v4ActiveRoute.engine==='definition'){info=v4DefinitionMode[mode];v4RenderDefinition();}
@@ -4117,18 +4451,20 @@ function v4TriggerMode(mode){
  document.getElementById('overviewTitle').innerHTML=info.title+` <span class="eng-sub">${v4Esc(info.eng||'')}</span>`;
  document.getElementById('overviewDesc').innerHTML=info.desc;
  if(v4ActiveRoute.engine==='ch2'){const [goal,compare]=V41_LEARNING_GOALS[activeNodeId]||[];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
+ if(v4ActiveRoute.engine==='ch5'){const {goal,compare}=V5_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  if(v4ActiveRoute.engine==='ch4'){const {goal,compare}=V43_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  if(v4ActiveRoute.engine==='ch3'){const {goal,compare}=V42_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  document.getElementById('overviewOT').innerHTML=info.ot;
  v44DisableUnmappedHotspots();
  const v42VisibleKeys=new Set(Array.from(document.querySelectorAll('#mainSvg .interactive-node[data-key]')).map(x=>x.dataset.key));
- const visibleStructures=['ch3','ch4'].includes(v4ActiveRoute.engine)?Object.fromEntries(Object.entries(v4ActiveRoute.structures).filter(([k])=>v42VisibleKeys.has(k))):v4ActiveRoute.structures;
+ const visibleStructures=['ch3','ch4','ch5'].includes(v4ActiveRoute.engine)?Object.fromEntries(Object.entries(v4ActiveRoute.structures).filter(([k])=>v42VisibleKeys.has(k))):v4ActiveRoute.structures;
  renderQuickIndexList(visibleStructures);
  const visible=Array.from(v42VisibleKeys).find(k=>v4ActiveRoute.structures[k]);
- const firstKey=['ch2','ch3','ch4'].includes(v4ActiveRoute.engine)?visible:Object.keys(v4ActiveRoute.structures)[0];
+ const firstKey=['ch2','ch3','ch4','ch5'].includes(v4ActiveRoute.engine)?visible:Object.keys(v4ActiveRoute.structures)[0];
  if(firstKey)selectStructureItem(v4ActiveRoute.structures[firstKey],firstKey);
  v4AnnotateSvgAccessibility();
  document.getElementById('sceneContext').textContent='點選構造或下方索引，圖形及解說將同步更新。';
+ v5ScheduleFontFit();
 }
 function v4RenderDefinition(){
  clearSvgLayers();const bar=document.getElementById('layerControlsBar');
@@ -4366,7 +4702,7 @@ function v4StartQuiz(mode){
  if(mode==='exam')items=v4Shuffle(items).map(x=>({...x,choices:v4Shuffle(x.choices)}));
  v4Quiz={chapter,mode,items,answers:{},finished:false};
  const title=mode==='practice'?'練習模式 · 每題即時回饋':'模擬測驗 · 交卷前不顯示正確答案';
- const html=v4ModeMenu()+`<div class="quiz-header-box"><div><h3 style="color:#fff">${title}</h3><p class="quiz-progress-line">${chapter==='ch1'?'第一章完整題庫 15 題':chapter==='ch2'?'第二章完整題庫 20 題':chapter==='ch3'?'第三章完整題庫 25 題':'第四章完整題庫 20 題'}</p></div><div class="quiz-score-badge" id="quizScoreBoard">已作答 0/${items.length}</div></div>`+
+ const html=v4ModeMenu()+`<div class="quiz-header-box"><div><h3 style="color:#fff">${title}</h3><p class="quiz-progress-line">${chapter==='ch1'?'第一章完整題庫 15 題':chapter==='ch2'?'第二章完整題庫 20 題':chapter==='ch3'?'第三章完整題庫 25 題':chapter==='ch4'?'第四章完整題庫 20 題':'第五章骨骼系統 40 題'}</p></div><div class="quiz-score-badge" id="quizScoreBoard">已作答 0/${items.length}</div></div>`+
  '<div id="v4QuizSummarySlot"></div>'+items.map((q,i)=>`<div class="q-card" id="qCard-${i}"><div class="q-title">${v4Esc(q.q)}</div><div class="q-options">${q.choices.map((opt,j)=>`<button class="q-opt" id="qOpt-${i}-${j}" onclick="v4AnswerQuiz(${i},${j})">${'ABCD'[j]}. ${v4Esc(opt.label)}</button>`).join('')}</div><div class="q-exp" id="qExp-${i}" style="display:none"><strong>💡 解說：</strong>${v4Esc(q.exp)}<button class="quiz-jump" onclick="v4JumpTo('${q.related}')">回到相關教材</button></div></div>`).join('')+
  `<div class="quiz-menu"><button class="quiz-finish" id="quizSubmitBtn" onclick="${mode==='exam'?'v4FinishQuiz()':'v4RestartQuiz()'}">${mode==='exam'?'📩 交卷並查看成績':'🔄 重新練習'}</button></div>`;
  document.getElementById('quizSectionContainer').innerHTML=html;
@@ -4427,7 +4763,8 @@ function v4RenderImageQuestion(){
  const q=s.bank[s.i],route=V4_ROUTES[q.scene];v4ActiveRoute=route;v4SelectedStructure=null;
  document.getElementById('svgContainer').className='svg-wrapper '+route.theme;
  resetZoom();
- if(route.engine==='ch4')v43DrawChapterScene(q.scene,q.mode,true);
+ if(route.engine==='ch5')v5RenderScene(q.scene,q.mode,true);
+ else if(route.engine==='ch4')v43DrawChapterScene(q.scene,q.mode,true);
  else if(route.engine==='ch2')v41RenderCh2Scene(q.scene,q.mode,true);
  else if(route.engine==='ch3')v42RenderScene(q.scene,q.mode,true);
  else if(route.engine==='ch1')renderCh1Canvas(route.source,q.mode);
@@ -4448,6 +4785,7 @@ function v4RenderImageQuestion(){
  s.answered=false;
  v44DisableUnmappedHotspots();
  v4AnnotateSvgAccessibility();
+ v5ScheduleFontFit();
 }
 function v4AnswerImage(key){
  const s=v4ImageQuiz;if(!s||s.answered||s.finished)return;
@@ -4488,7 +4826,7 @@ function v4DashboardHtml(){
   return `<div class="dash-box"><h3>${V4_CHAPTER_NAMES[ch]}</h3><div>已完成 ${done} / ${ids.length} 小節</div><div class="dash-rail"><div style="width:${done/ids.length*100}%"></div></div><div class="dash-meta">已建置 ${available} 小節；其餘後續擴充</div><button class="dash-link" onclick="${available?`v4JumpTo('${ids.find(id=>V4_ROUTES[id])}')`:`v4NavigateChapter('${ch}')`}">${available?'繼續學習':'查看章節目錄'}</button></div>`;
  });
  const history=v4State.history.slice(-8).reverse();
- const hist=history.length?`<table class="dash-table"><thead><tr><th>日期</th><th>章節與模式</th><th>答對率</th></tr></thead><tbody>${history.map(h=>`<tr><td>${v4Esc(h.time.slice(0,10))}</td><td>${v4Esc(V4_CHAPTER_NAMES[h.chapter])}<div class="dash-meta">${h.mode==='exam'?'模擬':h.mode==='image'?'圖像':'練習'}</div></td><td>${Math.round(h.correct/h.total*100)}% (${h.correct}/${h.total})</td></tr>`).join('')}</tbody></table>`:'<p class="dash-empty">尚無測驗紀錄，可從第一至四章的學後測驗開始。</p>';
+ const hist=history.length?`<table class="dash-table"><thead><tr><th>日期</th><th>章節與模式</th><th>答對率</th></tr></thead><tbody>${history.map(h=>`<tr><td>${v4Esc(h.time.slice(0,10))}</td><td>${v4Esc(V4_CHAPTER_NAMES[h.chapter])}<div class="dash-meta">${h.mode==='exam'?'模擬':h.mode==='image'?'圖像':'練習'}</div></td><td>${Math.round(h.correct/h.total*100)}% (${h.correct}/${h.total})</td></tr>`).join('')}</tbody></table>`:'<p class="dash-empty">尚無測驗紀錄，可從第一至五章的學後測驗開始。</p>';
  const wrong=Object.entries(v4State.wrong).sort((a,b)=>b[1].count-a[1].count).slice(0,15);
  const wrongHtml=wrong.length?wrong.map(([key,x])=>`<div style="border-bottom:1px solid #334155;padding:8px 0"><strong style="color:#fbbf24">錯 ${x.count} 次</strong>　${v4Esc(x.question)}<div>${x.related&&V4_ROUTES[x.related]?`<button class="dash-link" onclick="v4JumpTo('${x.related}')">開啟相關互動教材</button>`:'<span class="dash-meta">教材待完成</span>'}</div></div>`).join(''):'<p class="dash-empty">尚無錯題紀錄。</p>';
  return `<div class="dash-box" style="margin-bottom:12px"><strong>📌 本機學習資料狀態</strong><div class="dash-meta">已記錄 ${Object.keys(v4State.notes).filter(k=>v4State.notes[k].trim()).length} 小節筆記、${v4State.history.length} 次測驗；目前資料儲存 ${v4StorageAvailable?'正常':'受限'}。</div><p class="dash-meta">建議在更換檔案位置或瀏覽器之前，先匯出 JSON 備份。</p></div><div class="dashboard-grid">${blocks.join('')}<div class="dash-box"><h3>最近測驗紀錄</h3>${hist}</div><div class="dash-box"><h3>錯題與重點複習</h3>${wrongHtml}</div></div>`;
@@ -4505,7 +4843,7 @@ function exportStudyBackup(){
   const bundle={schema:'ot-anatomy-study-v4',exportedAt:new Date().toISOString(),app:'新編解剖學：職能治療互動學習系統',study:v4State};
   const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(blob),link=document.createElement('a');
-  link.href=url;link.download='新編解剖學_V4_學習備份_'+new Date().toISOString().slice(0,10)+'.json';
+  link.href=url;link.download='新編解剖學_V5_學習備份_'+new Date().toISOString().slice(0,10)+'.json';
   document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
   v4Toast('已產生 JSON 備份，請確認檔案儲存位置。');
  }catch(e){alert('備份匯出失敗：'+e.message);}
@@ -4553,10 +4891,54 @@ async function importStudyBackup(event){
  finally{input.value='';}
 }
 
+
+// V5.0 全章 SVG 文字可讀性優化：先放大，再依容器／可用寬度收縮，維持文字不裁切。
+let v5FontScale=1.12;
+try{const val=Number(localStorage.getItem('OT_ANATOMY_SVG_FONT_SCALE'));if(val>=.85&&val<=1.50)v5FontScale=val;}catch(e){}
+function v5AdjustFont(delta){
+ v5FontScale=Math.min(1.5,Math.max(.85,Math.round((v5FontScale+delta*.10)*100)/100));
+ try{localStorage.setItem('OT_ANATOMY_SVG_FONT_SCALE',String(v5FontScale));}catch(e){}
+ v5ScheduleFontFit();
+ v4Toast('圖解字體倍率：'+Math.round(v5FontScale*100)+'%；若字數較多會自動適應可用空間');
+}
+let v5FontPending=false;
+function v5ScheduleFontFit(){
+ if(v5FontPending)return;
+ v5FontPending=true;
+ requestAnimationFrame(()=>{v5FontPending=false;v5OptimizeSVGText();});
+}
+function v5OptimizeSVGText(){
+ const svg=document.getElementById('mainSvg');if(!svg)return;
+ const rects=[...svg.querySelectorAll('rect')].map(r=>({x:+r.getAttribute('x'),y:+r.getAttribute('y'),w:+r.getAttribute('width'),h:+r.getAttribute('height')}))
+ .filter(r=>Number.isFinite(r.x+r.y+r.w+r.h)&&r.w>=50&&r.h>=22);
+ [...svg.querySelectorAll('text')].forEach(el=>{
+  const x=parseFloat(el.getAttribute('x')),y=parseFloat(el.getAttribute('y'));
+  if(!Number.isFinite(x)||!Number.isFinite(y))return;
+  if(!el.dataset.v5FontOriginal){
+   const base=parseFloat(el.style.fontSize||el.getAttribute('font-size')||getComputedStyle(el).fontSize)||13;
+   el.dataset.v5FontOriginal=String(base);
+  }
+  const base=Number(el.dataset.v5FontOriginal)||13;
+  const desired=Math.min(27,Math.max(16,base*1.30+1.5)*v5FontScale);
+  const anchor=el.getAttribute('text-anchor')||'start';
+  let box={x:12,y:0,w:776,h:500};
+  const candidates=rects.filter(r=>x>=r.x+2&&x<=r.x+r.w-2&&y>=r.y+8&&y<=r.y+r.h+4);
+  if(candidates.length){candidates.sort((a,b)=>a.w*a.h-b.w*b.h);box=candidates[0];}
+  const left=box.x+8,right=box.x+box.w-8;
+  let avail=anchor==='middle'?2*Math.min(x-left,right-x):anchor==='end'?x-left:right-x;
+  avail=Math.max(35,Math.min(774,avail));
+  el.setAttribute('font-size',String(desired));el.style.fontSize=desired+'px';
+  let size=desired;
+  try{const len=el.getComputedTextLength();if(len>avail*.97)size=Math.max(11,desired*(avail*.95/len));}catch(e){}
+  el.setAttribute('font-size',String(Math.round(size*10)/10));el.style.fontSize=(Math.round(size*10)/10)+'px';
+ });
+}
+
 // 統一初始化，避免舊版註冊兩次 DOMContentLoaded 而重複啟動。
 document.addEventListener('DOMContentLoaded',()=>{
  document.getElementById('userNoteInput').addEventListener('input',v4NoteInput);
  v44InitPanZoom();
+ v5ScheduleFontFit();
  document.getElementById('v4Dashboard').addEventListener('click',e=>{if(e.target.id==='v4Dashboard')closeDashboard();});
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDashboard();});
  v4MigrateLegacyNotes();
