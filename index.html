@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新編解剖學：職能治療互動學習系統 V5.0｜五章整合與圖解字級優化版</title>
+<title>新編解剖學：職能治療互動學習系統 V6.0｜六章整合・關節互動學習版</title>
 <style>
   :root {
     --bg-dark: #0f172a;
@@ -639,6 +639,12 @@ button:disabled { cursor:not-allowed; }
  .v5-font-tools .v4-action{padding:7px 10px;min-width:38px;font-size:.84rem}
  #mainSvg .node-label,#mainSvg .node-label-dark{paint-order:stroke;stroke-linejoin:round;stroke-width:2px}
  @media(max-width:1080px){.v5-font-tools{flex:0 0 auto}.v5-font-tools .v4-action{min-height:38px}}
+/* V6.0：六章切換與可點選 SVG 標記 */
+#mainSvg .v6-target { cursor:pointer; }
+#mainSvg .v6-target:hover { filter:drop-shadow(0 0 12px #38bdf8); }
+#mainSvg .v6-target circle { pointer-events:all; }
+.v6-angle-control{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#e2e8f0;min-height:40px}.v6-angle-control input{width:min(130px,27vw);accent-color:#38bdf8;touch-action:pan-x}.v6-angle-note{font-size:.73rem;color:#94a3b8}
+@media(max-width:1080px){.chapter-tabs{scroll-snap-type:x proximity}.chapter-tabs>.chap-tab{scroll-snap-align:start}}
 </style>
 </head>
 <body>
@@ -646,7 +652,7 @@ button:disabled { cursor:not-allowed; }
 <header>
   <div class="brand">
     <h1>📘 新編解剖學：職能治療互動學習系統</h1>
-    <span class="badge">V5.0 五章互動整合版</span>
+    <span class="badge">V6.0 六章互動整合版</span>
   </div>
   <div class="chapter-tabs">
     <button class="chap-tab active" id="topTab-ch1" onclick="selectChapter('ch1')">第一章：緒論</button>
@@ -654,13 +660,14 @@ button:disabled { cursor:not-allowed; }
     <button class="chap-tab" id="topTab-ch3" onclick="selectChapter('ch3')">第三章：組織</button>
     <button class="chap-tab" id="topTab-ch4" onclick="selectChapter('ch4')">第四章：皮膚系統</button>
     <button class="chap-tab" id="topTab-ch5" onclick="selectChapter('ch5')">第五章：骨骼系統</button>
+    <button class="chap-tab" id="topTab-ch6" onclick="selectChapter('ch6')">第六章：關節</button>
     <button class="btn-quiz-toggle" id="quizMaskBtn" onclick="toggleQuizMask()">🎯 跑台自測遮罩：關閉</button>
   </div>
 </header>
 
 <div class="learning-toolbar" role="toolbar" aria-label="學習工具列">
-  <button class="v4-pill" id="dashboardOpen" onclick="openDashboard()">📊 學習總覽 <strong id="overallProgress">0/54</strong></button>
-  <span class="toolbar-hint" id="currentLearningLabel">目前教材：第一至五章完整互動教材</span>
+  <button class="v4-pill" id="dashboardOpen" onclick="openDashboard()">📊 學習總覽 <strong id="overallProgress">0/61</strong></button>
+  <span class="toolbar-hint" id="currentLearningLabel">目前教材：第一至六章完整互動教材</span>
   <div class="toolbar-spacer"></div>
    <div class="v5-font-tools" aria-label="圖解字體尺寸"><span>圖解字體</span><button class="v4-action" type="button" onclick="v5AdjustFont(-1)" title="縮小圖解字體" aria-label="縮小圖解字體">A−</button><button class="v4-action" type="button" onclick="v5AdjustFont(1)" title="放大圖解字體" aria-label="放大圖解字體">A＋</button></div>
   <button class="v4-action" onclick="exportStudyBackup()" title="匯出所有筆記、進度與測驗紀錄">⬇ 備份 JSON</button>
@@ -2419,10 +2426,10 @@ function loadNoteForCurrentNode() {
 // 現有 V3.0 的所有 SVG 繪圖函式與解說資料仍完整保留。
 // ============================================================================
 const V4_STORAGE_KEY = 'OT_ANATOMY_V4_STUDY';
-const V4_NODE_TOTAL = 54;
-const V4_CHAPTERS = ['ch1','ch2','ch3','ch4','ch5'];
+const V4_NODE_TOTAL = 61;
+const V4_CHAPTERS = ['ch1','ch2','ch3','ch4','ch5','ch6'];
 const V4_CHAPTER_NAMES = {
-  ch1:'第一章 緒論',ch2:'第二章 基本生物化學與細胞',ch3:'第三章 組織',ch4:'第四章 皮膚系統',ch5:'第五章 骨骼系統'
+  ch1:'第一章 緒論',ch2:'第二章 基本生物化學與細胞',ch3:'第三章 組織',ch4:'第四章 皮膚系統',ch5:'第五章 骨骼系統',ch6:'第六章 關節'
 };
 
 // 正式目錄的小節一律獨立，章節內的子模式則由 routeRegistry 映射至既有 SVG 引擎。
@@ -2525,6 +2532,25 @@ textbookTree.ch5={title:'📖 第五章 骨骼系統',nodes:[
   {id:'ch5_lower',label:"H-肆. 下肢骨",status:'done'},
   {type:'group',label:'I. 學後測驗'},
   {id:'ch5_quiz',label:'I. 第五章學後測驗（40題＋15題圖像辨識）',status:'done',isQuiz:true}
+]};
+
+
+// V6.0：完全依據使用者提供的第六章照片大綱，單元內增列可點選的分項。
+textbookTree.ch6={title:'📖 第六章 關節 (Articulations)',nodes:[
+ {type:'group',label:'A. 關節的分類'},
+ {id:'ch6_classification',label:'A. 關節的分類（功能／構造）',status:'done'},
+ {type:'group',label:'B. 纖維關節'},
+ {id:'ch6_fibrous',label:'B. 纖維關節（骨縫／韌帶連結／嵌合）',status:'done'},
+ {type:'group',label:'C. 軟骨關節'},
+ {id:'ch6_cartilage',label:'C. 軟骨關節（軟骨結合／聯合）',status:'done'},
+ {type:'group',label:'D. 滑膜關節'},
+ {id:'ch6_synovial',label:'D-壹. 滑膜關節構造及支持',status:'done'},
+ {id:'ch6_types',label:'D-貳. 六種滑膜關節類型',status:'done'},
+ {id:'ch6_motion',label:'D-參. 關節的運動與方向',status:'done'},
+ {type:'group',label:'E. 人體的關節'},
+ {id:'ch6_body',label:'E. 人體重要關節',status:'done'},
+ {type:'group',label:'F. 學後測驗'},
+ {id:'ch6_quiz',label:'F. 第六章學後測驗（30題＋12圖像辨識）',status:'done',isQuiz:true}
 ]};
 
 const V4_NODES = Object.fromEntries(V4_CHAPTERS.flatMap(ch =>
@@ -4282,6 +4308,13 @@ function v5RenderScene(node,mode,imageMode=false){
  document.getElementById('layer-labels').innerHTML=v5T(31,52,title,23,'#e0f2fe','start')+dr.labels;
  document.getElementById('layerControlsBar').innerHTML='<span style="color:var(--text-muted)">👁️ 圖層：</span><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer(\'layer-labels\',this.checked)"> 圖中文字</label><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer(\'layer-2\',this.checked)"> 構造索引</label><span class="v41-control-label">點選骨骼／索引查看完整詳解</span>';
  const svg=document.getElementById('mainSvg');svg.setAttribute('viewBox','0 0 800 500');svg.classList.toggle('quiz-hidden',imageMode||quizMaskActive);
+ // 當前模式只開放對應構造點選；其餘骨骼仍作空間背景，不攔截目標熱區。
+ const permitted=new Set(activeKeys);
+ svg.querySelectorAll('.interactive-node[data-key]').forEach(el=>{
+  if(permitted.has(el.dataset.key))return;
+  el.classList.remove('interactive-node');el.classList.add('v5-context-only');
+  el.style.pointerEvents='none';el.removeAttribute('onclick');el.removeAttribute('tabindex');el.removeAttribute('role');
+ });
  v4AnnotateSvgAccessibility();
 }
 
@@ -4290,14 +4323,14 @@ for(const [id,item] of Object.entries(V5_CONTENT)){
  const keys=Object.keys(item.modes);
  V4_ROUTES[id]={engine:'ch5',modes:keys,start:keys[0],structures:item.structures,theme:'theme-anatomical'};
 }
-V4_QUIZ_BANKS.ch5 = [{"related":"ch5_functions","q":"骨骼系統的哪一項功能最直接與紅骨髓相關？","opts":["血球生成","甲狀腺激素分泌","膽汁合成","腸道蠕動"],"ans":0,"exp":"紅骨髓含造血幹細胞與支持微環境，可產生血球。"},{"related":"ch5_functions","q":"下列何者最適合說明骨骼在人體運動中的角色？","opts":["作為肌肉拉動的槓桿","自行收縮產生動力","直接傳導神經動作電位","主動分泌滑液"],"ans":0,"exp":"骨骼透過關節及肌肉牽引產生運動，本身不主動收縮。"},{"related":"ch5_functions","q":"骨骼中含量豐富、與骨礦物質儲存最相關的元素為何？","opts":["鈣與磷","鐵與碘","鈉與氯","碳與氮"],"ans":0,"exp":"骨中的羥磷灰石主要含磷酸鈣。"},{"related":"ch5_tissue","q":"主要製造類骨質（osteoid）的細胞為何？","opts":["成骨細胞","破骨細胞","紅血球","軟骨細胞"],"ans":0,"exp":"成骨細胞分泌含第一型膠原的類骨質，進一步礦化。"},{"related":"ch5_tissue","q":"下列哪種細胞最直接負責骨吸收？","opts":["破骨細胞","成骨細胞","骨原細胞","骨髓脂肪細胞"],"ans":0,"exp":"破骨細胞為多核細胞，能酸化並分解礦化骨基質。"},{"related":"ch5_tissue","q":"骨基質中的第一型膠原主要提供什麼性質？","opts":["抗張韌性","電傳導能力","神經髓鞘","血液氧運輸"],"ans":0,"exp":"膠原提供抗拉的韌性，礦物質提供主要硬度。"},{"related":"ch5_class_region","q":"標準成人骨骼的中軸骨骼通常約有多少塊？","opts":["80塊","126塊","206塊","22塊"],"ans":0,"exp":"成人骨骼通常206塊，中軸80塊、附肢126塊。"},{"related":"ch5_class_region","q":"下列何者屬於附肢骨骼？","opts":["肩胛骨","胸骨","顱頂骨","胸椎"],"ans":0,"exp":"肩帶骨骼含鎖骨、肩胛骨，屬附肢骨骼。"},{"related":"ch5_class_shape","q":"指骨依骨骼外型分類應屬何者？","opts":["長骨","短骨","扁平骨","不規則骨"],"ans":0,"exp":"長骨以長度相對寬度的外形特徵分類，並不以絕對尺寸分類。"},{"related":"ch5_class_shape","q":"髕骨最典型的外型分類為何？","opts":["種子骨","短骨","不規則骨","扁平骨"],"ans":0,"exp":"髕骨位於股四頭肌腱系統中，是人體最大的種子骨。"},{"related":"ch5_class_shape","q":"椎骨通常屬於哪類外形？","opts":["不規則骨","長骨","短骨","種子骨"],"ans":0,"exp":"椎骨外形複雜，屬不規則骨。"},{"related":"ch5_gross","q":"覆蓋多數骨外表面，富含神經與血管的構造是？","opts":["骨膜","關節軟骨","骨髓腔","骨陷窩"],"ans":0,"exp":"骨膜覆蓋非關節面的骨外表面，對生長與修復重要。"},{"related":"ch5_gross","q":"長骨關節端覆蓋的主要軟骨種類為何？","opts":["透明軟骨","彈性軟骨","纖維軟骨","骨板"],"ans":0,"exp":"多數滑膜關節的關節軟骨是透明軟骨。"},{"related":"ch5_gross","q":"骨幹中央主要容納骨髓的空間稱為？","opts":["骨髓腔","骨小管","中央管","關節盂"],"ans":0,"exp":"典型長骨骨幹內有骨髓腔，常含黃骨髓。"},{"related":"ch5_micro","q":"緻密骨骨單位中心的管道為何？","opts":["中央管（哈氏管）","椎孔","腕骨管","鼻淚管"],"ans":0,"exp":"骨單位中央管可含微血管與神經。"},{"related":"ch5_micro","q":"骨細胞位於骨基質中的哪個微小空間？","opts":["骨陷窩","骨膜","骨骺線","營養孔"],"ans":0,"exp":"骨陷窩容納骨細胞，骨小管可讓細胞間互通。"},{"related":"ch5_micro","q":"關於海綿骨的描述何者正確？","opts":["以骨小樑網絡為主","每個骨小樑均有典型完整骨單位","完全沒有血液供應","只出現在骨幹外層"],"ans":0,"exp":"海綿骨主要為骨小樑及骨髓空間，通常不具典型同心圓骨單位。"},{"related":"ch5_ossification","q":"下列何者較典型地經膜內骨化形成？","opts":["部分顱蓋骨","股骨骨幹大部分","脛骨長度生長板","一般長骨初期軟骨模型"],"ans":0,"exp":"膜內骨化從間葉組織直接形成骨；長骨多以軟骨內骨化為主。"},{"related":"ch5_ossification","q":"軟骨內骨化首先使用何種模型？","opts":["透明軟骨","彈性軟骨","成熟緻密骨","成層角質上皮"],"ans":0,"exp":"典型長骨以透明軟骨模型為骨化的基礎。"},{"related":"ch5_growth","q":"長骨增加長度最直接依賴哪個構造？","opts":["骨骺生長板","骨膜外側表面","骨髓腔脂肪","骨中央管"],"ans":0,"exp":"生長板軟骨增生並被新骨取代，使長骨伸長。"},{"related":"ch5_growth","q":"骨骼直徑增厚主要與何種生長有關？","opts":["骨膜附加性生長","神經軸突再生","表皮角質形成","紅血球增生"],"ans":0,"exp":"骨膜側成骨細胞沉積新骨，內部可同時發生吸收。"},{"related":"ch5_growth","q":"生長板軟骨細胞排列成縱向柱列的區域是？","opts":["增生區","骨膜外層","骨髓腔","關節囊"],"ans":0,"exp":"增生區細胞分裂與柱狀排列促進長度增長。"},{"related":"ch5_homeostasis","q":"何者是骨重塑時主要負責骨形成的細胞？","opts":["成骨細胞","破骨細胞","嗜中性球","軟骨內皮細胞"],"ans":0,"exp":"成骨細胞製造新類骨質，與破骨細胞吸收共同形成重塑循環。"},{"related":"ch5_homeostasis","q":"在血鈣偏低時，哪一激素有助於提高血鈣？","opts":["副甲狀腺素","胰島素","褪黑激素","催產素"],"ans":0,"exp":"副甲狀腺素參與腎臟鈣保留與骨鈣調節，並間接促進腸道鈣吸收。"},{"related":"ch5_aging","q":"骨質疏鬆常增加下列哪種骨折風險？","opts":["脆弱性髖部骨折","耳廓軟骨撕裂","指甲生長異常","腱鞘囊腫"],"ans":0,"exp":"骨質疏鬆會增加椎體、髖部與遠端橈骨等部位的骨折風險。"},{"related":"ch5_aging","q":"下列何者屬於骨骼老化可能出現的微觀改變？","opts":["骨小樑變薄、連接減少","所有骨板完全消失","骨密度必然逐年增加","成年後不再發生骨重塑"],"ans":0,"exp":"部分個體隨老化骨小樑減少、皮質骨變薄，但差異受健康與生活型態影響。"},{"related":"ch5_landmarks","q":"骨表面供血管神經通過的開口一般稱為？","opts":["孔（foramen）","髁（condyle）","粗隆（tuberosity）","棘（spine）"],"ans":0,"exp":"Foramen 為骨孔，常供血管、神經穿越。"},{"related":"ch5_landmarks","q":"肩峰較接近下列哪種骨骼表面標記？","opts":["骨突","骨髓腔","骨陷窩","骨小樑"],"ans":0,"exp":"肩峰是肩胛棘向外延伸的骨突起。"},{"related":"ch5_skull","q":"成人頭顱骨（不含聽小骨與舌骨）通常共幾塊？","opts":["22塊","8塊","14塊","29塊"],"ans":0,"exp":"成人頭顱骨典型共22塊，其中腦顱8、顏面14。"},{"related":"ch5_skull","q":"枕骨大孔主要位於哪塊骨？","opts":["枕骨","額骨","上顎骨","顴骨"],"ans":0,"exp":"枕骨大孔位於顱底枕骨，鄰近延髓與脊髓交界。"},{"related":"ch5_spine","q":"成人典型胸椎有多少節？","opts":["12節","7節","5節","10節"],"ans":0,"exp":"典型脊柱有頸椎7節、胸椎12節、腰椎5節。"},{"related":"ch5_spine","q":"樞椎（C2）的特色構造為何？","opts":["齒突","髖臼","鷹嘴","關節盂"],"ans":0,"exp":"C2具齒突，參與寰樞關節轉動。"},{"related":"ch5_thorax","q":"哪一組肋骨屬浮肋？","opts":["第11–12對","第1–2對","第5–7對","第8–10對"],"ans":0,"exp":"第11與12對前端不連胸骨，屬浮肋。"},{"related":"ch5_thorax","q":"胸骨由上而下依序通常分為？","opts":["胸骨柄、胸骨體、劍突","劍突、胸骨體、胸骨柄","鎖骨、肩峰、胸骨體","胸骨柄、肋骨、劍突"],"ans":0,"exp":"胸骨上方為胸骨柄，中段胸骨體，下端劍突。"},{"related":"ch5_shoulder","q":"肩胛骨外側與肱骨頭接合的部位為？","opts":["關節盂","肩胛棘","喙突","肩胛下窩"],"ans":0,"exp":"肩胛骨外側關節盂與肱骨頭形成肩關節。"},{"related":"ch5_shoulder","q":"肩胛棘向外側延伸形成哪個構造？","opts":["肩峰","喙突","坐骨粗隆","骨骺線"],"ans":0,"exp":"肩峰是肩胛棘外側的骨性延伸。"},{"related":"ch5_upper","q":"標準解剖學姿勢下，前臂外側的骨骼是？","opts":["橈骨","尺骨","肱骨","腕骨"],"ans":0,"exp":"橈骨位於拇指側，尺骨位於小指側。"},{"related":"ch5_upper","q":"單側手部通常有幾塊腕骨？","opts":["8塊","7塊","5塊","14塊"],"ans":0,"exp":"腕骨每側8塊，分近端列和遠端列。"},{"related":"ch5_pelvis","q":"下列何者不屬於髖骨三部分之一？","opts":["薦骨","髂骨","坐骨","恥骨"],"ans":0,"exp":"髖骨由髂、坐、恥三部分融合；薦骨屬中軸骨骼。"},{"related":"ch5_lower","q":"關於脛骨與腓骨的敘述何者正確？","opts":["脛骨位內側且主要承重","腓骨位內側且主要承重","脛骨是上臂長骨","腓骨構成髕骨"],"ans":0,"exp":"在標準解剖姿勢下脛骨在內側，為小腿主要承重骨。"}];
+V4_QUIZ_BANKS.ch5 = [{"related":"ch5_functions","q":"骨骼系統的哪一項功能最直接與紅骨髓相關？","opts":["血球生成","甲狀腺激素分泌","膽汁合成","腸道蠕動"],"ans":0,"exp":"紅骨髓含造血幹細胞與支持微環境，可產生血球。"},{"related":"ch5_functions","q":"下列何者最適合說明骨骼在人體運動中的角色？","opts":["自行收縮產生動力","作為肌肉拉動的槓桿","直接傳導神經動作電位","主動分泌滑液"],"ans":1,"exp":"骨骼透過關節及肌肉牽引產生運動，本身不主動收縮。"},{"related":"ch5_functions","q":"骨骼中含量豐富、與骨礦物質儲存最相關的元素為何？","opts":["鐵與碘","鈉與氯","鈣與磷","碳與氮"],"ans":2,"exp":"骨中的羥磷灰石主要含磷酸鈣。"},{"related":"ch5_tissue","q":"主要製造類骨質（osteoid）的細胞為何？","opts":["破骨細胞","紅血球","軟骨細胞","成骨細胞"],"ans":3,"exp":"成骨細胞分泌含第一型膠原的類骨質，進一步礦化。"},{"related":"ch5_tissue","q":"下列哪種細胞最直接負責骨吸收？","opts":["破骨細胞","成骨細胞","骨原細胞","骨髓脂肪細胞"],"ans":0,"exp":"破骨細胞為多核細胞，能酸化並分解礦化骨基質。"},{"related":"ch5_tissue","q":"骨基質中的第一型膠原主要提供什麼性質？","opts":["電傳導能力","抗張韌性","神經髓鞘","血液氧運輸"],"ans":1,"exp":"膠原提供抗拉的韌性，礦物質提供主要硬度。"},{"related":"ch5_class_region","q":"標準成人骨骼的中軸骨骼通常約有多少塊？","opts":["126塊","206塊","80塊","22塊"],"ans":2,"exp":"成人骨骼通常206塊，中軸80塊、附肢126塊。"},{"related":"ch5_class_region","q":"下列何者屬於附肢骨骼？","opts":["胸骨","顱頂骨","胸椎","肩胛骨"],"ans":3,"exp":"肩帶骨骼含鎖骨、肩胛骨，屬附肢骨骼。"},{"related":"ch5_class_shape","q":"指骨依骨骼外型分類應屬何者？","opts":["長骨","短骨","扁平骨","不規則骨"],"ans":0,"exp":"長骨以長度相對寬度的外形特徵分類，並不以絕對尺寸分類。"},{"related":"ch5_class_shape","q":"髕骨最典型的外型分類為何？","opts":["短骨","種子骨","不規則骨","扁平骨"],"ans":1,"exp":"髕骨位於股四頭肌腱系統中，是人體最大的種子骨。"},{"related":"ch5_class_shape","q":"椎骨通常屬於哪類外形？","opts":["長骨","短骨","不規則骨","種子骨"],"ans":2,"exp":"椎骨外形複雜，屬不規則骨。"},{"related":"ch5_gross","q":"覆蓋多數骨外表面，富含神經與血管的構造是？","opts":["關節軟骨","骨髓腔","骨陷窩","骨膜"],"ans":3,"exp":"骨膜覆蓋非關節面的骨外表面，對生長與修復重要。"},{"related":"ch5_gross","q":"長骨關節端覆蓋的主要軟骨種類為何？","opts":["透明軟骨","彈性軟骨","纖維軟骨","骨板"],"ans":0,"exp":"多數滑膜關節的關節軟骨是透明軟骨。"},{"related":"ch5_gross","q":"骨幹中央主要容納骨髓的空間稱為？","opts":["骨小管","骨髓腔","中央管","關節盂"],"ans":1,"exp":"典型長骨骨幹內有骨髓腔，常含黃骨髓。"},{"related":"ch5_micro","q":"緻密骨骨單位中心的管道為何？","opts":["椎孔","腕骨管","中央管（哈氏管）","鼻淚管"],"ans":2,"exp":"骨單位中央管可含微血管與神經。"},{"related":"ch5_micro","q":"骨細胞位於骨基質中的哪個微小空間？","opts":["骨膜","骨骺線","營養孔","骨陷窩"],"ans":3,"exp":"骨陷窩容納骨細胞，骨小管可讓細胞間互通。"},{"related":"ch5_micro","q":"關於海綿骨的描述何者正確？","opts":["以骨小樑網絡為主","每個骨小樑均有典型完整骨單位","完全沒有血液供應","只出現在骨幹外層"],"ans":0,"exp":"海綿骨主要為骨小樑及骨髓空間，通常不具典型同心圓骨單位。"},{"related":"ch5_ossification","q":"下列何者較典型地經膜內骨化形成？","opts":["股骨骨幹大部分","部分顱蓋骨","脛骨長度生長板","一般長骨初期軟骨模型"],"ans":1,"exp":"膜內骨化從間葉組織直接形成骨；長骨多以軟骨內骨化為主。"},{"related":"ch5_ossification","q":"軟骨內骨化首先使用何種模型？","opts":["彈性軟骨","成熟緻密骨","透明軟骨","成層角質上皮"],"ans":2,"exp":"典型長骨以透明軟骨模型為骨化的基礎。"},{"related":"ch5_growth","q":"長骨增加長度最直接依賴哪個構造？","opts":["骨膜外側表面","骨髓腔脂肪","骨中央管","骨骺生長板"],"ans":3,"exp":"生長板軟骨增生並被新骨取代，使長骨伸長。"},{"related":"ch5_growth","q":"骨骼直徑增厚主要與何種生長有關？","opts":["骨膜附加性生長","神經軸突再生","表皮角質形成","紅血球增生"],"ans":0,"exp":"骨膜側成骨細胞沉積新骨，內部可同時發生吸收。"},{"related":"ch5_growth","q":"生長板軟骨細胞排列成縱向柱列的區域是？","opts":["骨膜外層","增生區","骨髓腔","關節囊"],"ans":1,"exp":"增生區細胞分裂與柱狀排列促進長度增長。"},{"related":"ch5_homeostasis","q":"何者是骨重塑時主要負責骨形成的細胞？","opts":["破骨細胞","嗜中性球","成骨細胞","軟骨內皮細胞"],"ans":2,"exp":"成骨細胞製造新類骨質，與破骨細胞吸收共同形成重塑循環。"},{"related":"ch5_homeostasis","q":"在血鈣偏低時，哪一激素有助於提高血鈣？","opts":["胰島素","褪黑激素","催產素","副甲狀腺素"],"ans":3,"exp":"副甲狀腺素參與腎臟鈣保留與骨鈣調節，並間接促進腸道鈣吸收。"},{"related":"ch5_aging","q":"骨質疏鬆常增加下列哪種骨折風險？","opts":["脆弱性髖部骨折","耳廓軟骨撕裂","指甲生長異常","腱鞘囊腫"],"ans":0,"exp":"骨質疏鬆會增加椎體、髖部與遠端橈骨等部位的骨折風險。"},{"related":"ch5_aging","q":"下列何者屬於骨骼老化可能出現的微觀改變？","opts":["所有骨板完全消失","骨小樑變薄、連接減少","骨密度必然逐年增加","成年後不再發生骨重塑"],"ans":1,"exp":"部分個體隨老化骨小樑減少、皮質骨變薄，但差異受健康與生活型態影響。"},{"related":"ch5_landmarks","q":"骨表面供血管神經通過的開口一般稱為？","opts":["髁（condyle）","粗隆（tuberosity）","孔（foramen）","棘（spine）"],"ans":2,"exp":"Foramen 為骨孔，常供血管、神經穿越。"},{"related":"ch5_landmarks","q":"肩峰較接近下列哪種骨骼表面標記？","opts":["骨髓腔","骨陷窩","骨小樑","骨突"],"ans":3,"exp":"肩峰是肩胛棘向外延伸的骨突起。"},{"related":"ch5_skull","q":"成人頭顱骨（不含聽小骨與舌骨）通常共幾塊？","opts":["22塊","8塊","14塊","29塊"],"ans":0,"exp":"成人頭顱骨典型共22塊，其中腦顱8、顏面14。"},{"related":"ch5_skull","q":"枕骨大孔主要位於哪塊骨？","opts":["額骨","枕骨","上顎骨","顴骨"],"ans":1,"exp":"枕骨大孔位於顱底枕骨，鄰近延髓與脊髓交界。"},{"related":"ch5_spine","q":"成人典型胸椎有多少節？","opts":["7節","5節","12節","10節"],"ans":2,"exp":"典型脊柱有頸椎7節、胸椎12節、腰椎5節。"},{"related":"ch5_spine","q":"樞椎（C2）的特色構造為何？","opts":["髖臼","鷹嘴","關節盂","齒突"],"ans":3,"exp":"C2具齒突，參與寰樞關節轉動。"},{"related":"ch5_thorax","q":"哪一組肋骨屬浮肋？","opts":["第11–12對","第1–2對","第5–7對","第8–10對"],"ans":0,"exp":"第11與12對前端不連胸骨，屬浮肋。"},{"related":"ch5_thorax","q":"胸骨由上而下依序通常分為？","opts":["劍突、胸骨體、胸骨柄","胸骨柄、胸骨體、劍突","鎖骨、肩峰、胸骨體","胸骨柄、肋骨、劍突"],"ans":1,"exp":"胸骨上方為胸骨柄，中段胸骨體，下端劍突。"},{"related":"ch5_shoulder","q":"肩胛骨外側與肱骨頭接合的部位為？","opts":["肩胛棘","喙突","關節盂","肩胛下窩"],"ans":2,"exp":"肩胛骨外側關節盂與肱骨頭形成肩關節。"},{"related":"ch5_shoulder","q":"肩胛棘向外側延伸形成哪個構造？","opts":["喙突","坐骨粗隆","骨骺線","肩峰"],"ans":3,"exp":"肩峰是肩胛棘外側的骨性延伸。"},{"related":"ch5_upper","q":"標準解剖學姿勢下，前臂外側的骨骼是？","opts":["橈骨","尺骨","肱骨","腕骨"],"ans":0,"exp":"橈骨位於拇指側，尺骨位於小指側。"},{"related":"ch5_upper","q":"單側手部通常有幾塊腕骨？","opts":["7塊","8塊","5塊","14塊"],"ans":1,"exp":"腕骨每側8塊，分近端列和遠端列。"},{"related":"ch5_pelvis","q":"下列何者不屬於髖骨三部分之一？","opts":["髂骨","坐骨","薦骨","恥骨"],"ans":2,"exp":"髖骨由髂、坐、恥三部分融合；薦骨屬中軸骨骼。"},{"related":"ch5_lower","q":"關於脛骨與腓骨的敘述何者正確？","opts":["腓骨位內側且主要承重","脛骨是上臂長骨","腓骨構成髕骨","脛骨位內側且主要承重"],"ans":3,"exp":"在標準解剖姿勢下脛骨在內側，為小腿主要承重骨。"}];
 V4_IMAGE_QUESTIONS.ch5=[
  {scene:'ch5_functions',mode:'support',target:'skull',prompt:'請點選保護腦部的「顱骨」。'},
  {scene:'ch5_functions',mode:'marrow',target:'red_marrow',prompt:'請點選「紅骨髓」。'},
  {scene:'ch5_tissue',mode:'cells',target:'osteoblast',prompt:'請點選負責形成骨基質的「成骨細胞」。'},
- {scene:'ch5_class_region',mode:'axial',target:'vertebra',prompt:'請點選位於身體中軸的「脊柱」。'},
+ {scene:'ch5_class_region',mode:'appendicular',target:'shoulder',prompt:'請點選屬於附肢骨骼的「肩帶」。'},
  {scene:'ch5_class_shape',mode:'sesamoid',target:'patella',prompt:'請點選種子骨「髕骨」。'},
- {scene:'ch5_gross',mode:'long_bone',target:'diaphysis',prompt:'請點選長骨中段的「骨幹」。'},
+ {scene:'ch5_gross',mode:'coverings',target:'cartilage',prompt:'請點選長骨末端的「關節軟骨」。'},
  {scene:'ch5_micro',mode:'osteon',target:'central_canal',prompt:'請點選骨單位中央的「中央管」。'},
  {scene:'ch5_growth',mode:'plate',target:'proliferative',prompt:'請點選生長板的「增生區」。'},
  {scene:'ch5_skull',mode:'front',target:'mandible',prompt:'請點選顏面骨中的「下顎骨」。'},
@@ -4307,6 +4340,241 @@ V4_IMAGE_QUESTIONS.ch5=[
  {scene:'ch5_upper',mode:'forearm',target:'radius',prompt:'請點選前臂外側的「橈骨」。'},
  {scene:'ch5_pelvis',mode:'overview',target:'acetabulum',prompt:'請點選「髖臼」。'},
  {scene:'ch5_lower',mode:'shank',target:'fibula',prompt:'請點選小腿外側的「腓骨」。'}
+];
+
+/* V6.0 關節互動 SVG：原創示意，不複製書中圖版；每個模式具獨立的構造定位與詳解。 */
+const V6_CONTENT={"ch6_classification":{"label":"A. 關節的分類","goal":"能分辨依活動程度的功能性分類與依連結材料、關節腔的構造性分類。","compare":"不動、微動、可動是功能分類；纖維、軟骨、滑膜是構造分類。兩者不是逐項一對一。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","modes":{"function":{"btn":"功能性三分類","title":"A. 功能性分類：不動、微動、可動","eng":"Functional Classification","desc":"依兩骨間允許的活動程度分為不動關節（synarthrosis）、微動關節（amphiarthrosis）及可動關節（diarthrosis）。不動如顱縫；微動如椎體間聯合；可動如肩肘膝等滑膜關節。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","visual":"classfunc","keys":["fixed","slight","free"]},"structure":{"btn":"構造性三分類","title":"A. 構造性分類：纖維、軟骨與滑膜","eng":"Structural Classification","desc":"依骨骼間結合組織與是否具有關節腔區分：纖維關節由緻密結締組織連接；軟骨關節以軟骨連接；滑膜關節有包裹滑液的關節腔。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","visual":"classstruct","keys":["fibrous","cartilage","synovial"]},"axes":{"btn":"活動軸數與例子","title":"A. 可動關節的軸數概念","eng":"Axes of Motion","desc":"單軸關節如典型肘關節的屈伸、車軸關節的旋轉；雙軸關節如橢圓與鞍狀關節；多軸如肩、髖球窩關節。軸數反映允許的主要運動方向。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","visual":"axes","keys":["uniaxial","biaxial","multiaxial"]}},"structures":{"fixed":{"title":"不動關節","shortName":"不動關節","eng":"Synarthrosis","desc":"顱縫等關節結合牢固，通常不動或僅極微動，主要提供保護與穩定。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"slight":{"title":"微動關節","shortName":"微動關節","eng":"Amphiarthrosis","desc":"如恥骨聯合及椎間盤聯合，可容許少量活動並承受力量。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"free":{"title":"可動關節","shortName":"可動關節","eng":"Diarthrosis","desc":"典型滑膜關節可活動，關節的自由度受構造限制。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"fibrous":{"title":"纖維關節","shortName":"纖維關節","eng":"Fibrous joint","desc":"骨間由富膠原的纖維結締組織連接，沒有真正滑膜關節腔。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"cartilage":{"title":"軟骨關節","shortName":"軟骨關節","eng":"Cartilaginous joint","desc":"以透明軟骨或纖維軟骨連結骨骼，沒有滑膜腔。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"synovial":{"title":"滑膜關節","shortName":"滑膜關節","eng":"Synovial joint","desc":"以關節囊包裹關節腔，表面有關節軟骨，腔內有少量滑液。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"uniaxial":{"title":"單軸關節","shortName":"單軸關節","eng":"Uniaxial","desc":"以單一主要軸運動，例如肘屈伸與上橈尺關節旋前旋後。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"biaxial":{"title":"雙軸關節","shortName":"雙軸關節","eng":"Biaxial","desc":"可在兩個主要平面活動，例如橈腕關節的屈伸與橈尺偏。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]},"multiaxial":{"title":"多軸關節","shortName":"多軸關節","eng":"Multiaxial","desc":"可在三軸活動，例如肩關節及髖關節。","ot":"OT 記錄活動度（ROM）時，需辨認關節是否可動、可動軸與穩定限制。","tags":["A. 關節的分類","第六章 關節"]}}},"ch6_fibrous":{"label":"B. 纖維關節","goal":"辨認骨縫、韌帶連結與嵌合關節的形態及例子。","compare":"骨縫、韌帶連結、嵌合關節都屬纖維關節；不能把『韌帶連結』誤認成滑膜關節。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","modes":{"suture":{"btn":"骨縫：顱骨接合","title":"B. 纖維關節｜骨縫","eng":"Suture","desc":"顱骨間以薄層致密纖維結締組織連接，交錯不規則的縫合邊緣增強穩定；成熟後可能逐漸骨性融合。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","visual":"suture","keys":["bone_left","suture_line","bone_right"]},"syndesmosis":{"btn":"韌帶連結：脛腓","title":"B. 纖維關節｜韌帶連結","eng":"Syndesmosis","desc":"骨間距可略大，由韌帶或骨間膜連結；例如遠端脛腓韌帶連結、橈尺骨間膜，通常活動受限。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","visual":"syndesmosis","keys":["tibia","fibula","synd_lig"]},"gomphosis":{"btn":"嵌合關節：牙根","title":"B. 纖維關節｜嵌合關節","eng":"Gomphosis","desc":"牙根嵌入齒槽骨，牙周韌帶連結牙根與齒槽骨，是具特色的纖維關節，功能上通常不動。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","visual":"tooth","keys":["tooth","periodontal","alveolus"]}},"structures":{"bone_left":{"title":"左側顱骨板","shortName":"左側顱骨板","eng":"Cranial bone","desc":"顱蓋骨板的鋸齒狀接合邊緣。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"suture_line":{"title":"骨縫","shortName":"骨縫","eng":"Suture line","desc":"介於兩塊顱骨間的纖維結締組織接合，通常為不動關節。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"bone_right":{"title":"右側顱骨板","shortName":"右側顱骨板","eng":"Cranial bone","desc":"與另一塊顱骨呈交錯接合。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"tibia":{"title":"脛骨","shortName":"脛骨","eng":"Tibia","desc":"位於小腿內側的主要承重骨，遠端與腓骨由韌帶固定。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"fibula":{"title":"腓骨","shortName":"腓骨","eng":"Fibula","desc":"位於小腿外側，提供踝部穩定與肌肉附著。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"synd_lig":{"title":"脛腓韌帶連結","shortName":"脛腓韌帶連結","eng":"Distal tibiofibular syndesmosis","desc":"緻密韌帶在遠端脛腓骨間提供穩定，受傷俗稱高位踝扭傷。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"tooth":{"title":"牙根","shortName":"牙根","eng":"Tooth root","desc":"牙齒的牙根嵌入齒槽中，並非兩塊骨之間的直接接合。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"periodontal":{"title":"牙周韌帶","shortName":"牙周韌帶","eng":"Periodontal ligament","desc":"以大量膠原纖維連結牙骨質與齒槽骨，傳遞咀嚼力量。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]},"alveolus":{"title":"齒槽骨","shortName":"齒槽骨","eng":"Alveolar bone","desc":"容納牙根的骨性齒槽。","ot":"臨床骨盆、踝遠端脛腓關節的韌帶穩定性，與負重、步行和踝部護具設計有關。","tags":["B. 纖維關節","第六章 關節"]}}},"ch6_cartilage":{"label":"C. 軟骨關節","goal":"比較軟骨結合與聯合的連接材料、活動程度及典型例子。","compare":"軟骨結合以透明軟骨為主；聯合以纖維軟骨為連接墊。生長板為暫時性的軟骨結合。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","modes":{"synchondrosis":{"btn":"軟骨結合：生長板","title":"C. 軟骨關節｜軟骨結合","eng":"Synchondrosis","desc":"骨間以透明軟骨直接連接，通常不動；例子為骨骺生長板及第一肋與胸骨柄之間的第一肋胸骨連結。成熟時部分暫時性軟骨結合會骨化。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","visual":"growthplate","keys":["epiphysis","growth_plate","diaphysis"]},"symphysis":{"btn":"聯合：椎間盤與恥骨","title":"C. 軟骨關節｜聯合","eng":"Symphysis","desc":"兩骨表面常有薄層透明軟骨，其間以纖維軟骨構成連接墊；典型例子為椎體間的椎間盤及恥骨聯合，通常允許微小活動。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","visual":"disc","keys":["vertebra_upper","disc","vertebra_lower"]}},"structures":{"epiphysis":{"title":"骨骺","shortName":"骨骺","eng":"Epiphysis","desc":"長骨末端的骨性部分，靠近關節面。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","tags":["C. 軟骨關節","第六章 關節"]},"growth_plate":{"title":"骨骺生長板","shortName":"骨骺生長板","eng":"Epiphyseal plate","desc":"透明軟骨構造，供長骨在發育期增長；癒合後形成骨骺線。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","tags":["C. 軟骨關節","第六章 關節"]},"diaphysis":{"title":"骨幹","shortName":"骨幹","eng":"Diaphysis","desc":"長骨主幹的骨質部分。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","tags":["C. 軟骨關節","第六章 關節"]},"vertebra_upper":{"title":"上方椎體","shortName":"上方椎體","eng":"Superior vertebral body","desc":"與椎間盤連接的上方椎體。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","tags":["C. 軟骨關節","第六章 關節"]},"disc":{"title":"椎間盤","shortName":"椎間盤","eng":"Intervertebral disc","desc":"纖維環與髓核共同構成的連接墊，容許局部有限活動。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","tags":["C. 軟骨關節","第六章 關節"]},"vertebra_lower":{"title":"下方椎體","shortName":"下方椎體","eng":"Inferior vertebral body","desc":"與椎間盤連接的下方椎體。","ot":"了解生長板、恥骨聯合和椎間盤可協助兒童發育與脊柱承重評估。","tags":["C. 軟骨關節","第六章 關節"]}}},"ch6_synovial":{"label":"D. 滑膜關節","goal":"能依剖面指出關節腔、軟骨、關節囊、滑膜、滑液及鄰近支持組織。","compare":"滑膜只襯於關節囊內側的非軟骨表面，不覆蓋關節軟骨；滑囊與腱鞘是減摩擦結構，不一定與關節腔相通。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","modes":{"structure":{"btn":"滑膜關節剖面","title":"D. 滑膜關節｜基本構造","eng":"Synovial Joint Structure","desc":"滑膜關節有關節腔（含少量滑液）；相對骨端覆蓋透明軟骨；關節囊外層為纖維層、內層為滑膜。附屬韌帶協助限制過度活動。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","visual":"synovial","keys":["bone_top","art_cart","cavity","syn_mem","capsule","bone_bottom"]},"accessory":{"btn":"滑囊、腱鞘、韌帶","title":"D. 滑膜關節｜減少摩擦與支持構造","eng":"Bursae, Tendon Sheaths and Ligaments","desc":"滑囊位於容易摩擦的肌腱、皮膚或骨面之間；腱鞘沿肌腱包繞以降低滑動摩擦；韌帶抵抗超出生理範圍的動作。滑囊或腱鞘通常不算關節囊的必要構造。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","visual":"bursa","keys":["bursa","tendon","tendon_sheath","ligament"]},"stability":{"btn":"關節穩定三因素","title":"D. 滑膜關節｜關節穩定性","eng":"Joint Stability","desc":"關節穩定主要取決於關節面形狀與吻合度、韌帶／關節囊的張力，以及跨關節肌群的張力和動態控制。活動度較大不代表穩定性一定較高。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","visual":"stability","keys":["surface","ligament","muscle"]}},"structures":{"bone_top":{"title":"上方骨端","shortName":"上方骨端","eng":"Articulating bone","desc":"兩骨關節面相接近但不直接融合。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"art_cart":{"title":"關節軟骨","shortName":"關節軟骨","eng":"Articular cartilage","desc":"多數滑膜關節的關節面由透明軟骨覆蓋，降低摩擦與分散壓力。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"cavity":{"title":"關節腔與滑液","shortName":"關節腔與滑液","eng":"Synovial cavity and fluid","desc":"關節腔為滑膜關節獨有構造；滑液潤滑並提供關節軟骨營養。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"syn_mem":{"title":"滑膜","shortName":"滑膜","eng":"Synovial membrane","desc":"位於關節囊內側、未被關節軟骨覆蓋的內表面，製造滑液成分。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"capsule":{"title":"纖維關節囊","shortName":"纖維關節囊","eng":"Fibrous capsule","desc":"關節囊的外部緻密結締組織層，包覆並提供穩定。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"bone_bottom":{"title":"下方骨端","shortName":"下方骨端","eng":"Articulating bone","desc":"另一骨端與關節軟骨形成關節面。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"bursa":{"title":"滑囊","shortName":"滑囊","eng":"Bursa","desc":"含少量潤滑液的囊袋，可減少肌腱、骨面等結構間的摩擦。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"tendon":{"title":"肌腱","shortName":"肌腱","eng":"Tendon","desc":"連接肌肉與骨骼，活動時可能經過骨性突起。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"tendon_sheath":{"title":"腱鞘","shortName":"腱鞘","eng":"Tendon sheath","desc":"包繞肌腱的滑動結構，可減少往返運動造成的摩擦。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"ligament":{"title":"韌帶","shortName":"韌帶","eng":"Ligament","desc":"連接骨與骨並限制過度運動，提供被動穩定。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"surface":{"title":"關節面吻合度","shortName":"關節面吻合度","eng":"Articular congruence","desc":"髖臼較深可提高骨性包覆；肩盂較淺則容許較大活動度。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]},"muscle":{"title":"肌肉張力與控制","shortName":"肌肉張力與控制","eng":"Dynamic stabilization","desc":"關節周圍肌肉收縮形成動態穩定，如肩旋轉肌袖。","ot":"OT 評估肩關節活動受限時需考慮關節囊、肌腱、韌帶、滑囊與肌力等多重因素。","tags":["D. 滑膜關節","第六章 關節"]}}},"ch6_types":{"label":"D-續. 六種滑膜關節型式","goal":"依關節面形態辨認滑動、屈戌、橢圓、車軸、鞍狀、球窩六類，理解其主要運動軸。","compare":"屈戌及車軸皆單軸，但前者偏屈伸、後者偏旋轉；橢圓與鞍狀為雙軸；球窩為多軸。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","modes":{"plane":{"btn":"滑動關節","title":"D-續. 滑膜關節｜滑動關節","eng":"Plane joint","desc":"近乎平面的關節面相對滑動，例子為腕骨間、跗骨間及部分肩帶關節；通常為非軸性滑動。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","visual":"type_plane","keys":["surface_1","glide"]},"hinge":{"btn":"屈戌關節","title":"D-續. 滑膜關節｜屈戌／鉸鏈關節","eng":"Hinge joint","desc":"以單一主要軸產生屈曲和伸展，如肘關節與指間關節；膝關節常描述為改良鉸鏈關節。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","visual":"type_hinge","keys":["hinge_axis","bone_arm"]},"ellipsoid":{"btn":"橢圓關節","title":"D-續. 滑膜關節｜橢圓／髁狀關節","eng":"Condyloid joint","desc":"卵圓形凸面與相對的凹面配合，允許屈伸與內收外展，屬雙軸；如橈腕關節、掌指關節。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","visual":"type_ellipsoid","keys":["oval_head","two_axes"]},"pivot":{"btn":"車軸關節","title":"D-續. 滑膜關節｜車軸關節","eng":"Pivot joint","desc":"環狀結構包圍一根骨性軸心，主要產生縱軸旋轉；如寰樞關節、上橈尺關節。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","visual":"type_pivot","keys":["pivot_rod","rotational"]},"saddle":{"btn":"鞍狀關節","title":"D-續. 滑膜關節｜鞍狀關節","eng":"Saddle joint","desc":"兩相對關節面一方向凹、另一方向凸，互相配合；如第一掌腕關節，容許拇指屈伸、外展內收及對掌。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","visual":"type_saddle","keys":["saddle_surface","opposition"]},"ball":{"btn":"球窩關節","title":"D-續. 滑膜關節｜球窩關節","eng":"Ball-and-socket joint","desc":"球形骨頭坐落於凹窩，能屈伸、外展內收、旋轉與環轉，如肩及髖關節。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","visual":"type_ball","keys":["ball_head","socket","multi_axis"]}},"structures":{"surface_1":{"title":"上方平面關節面","shortName":"上方平面關節面","eng":"Flat surface","desc":"平坦或微弧的接觸面，在另一關節面上滑動。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"glide":{"title":"滑動方向","shortName":"滑動方向","eng":"Gliding","desc":"主要是平行於接觸面的相對位移，活動幅度通常不大。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"hinge_axis":{"title":"屈伸軸","shortName":"屈伸軸","eng":"Flexion-extension axis","desc":"關節繞單一主要軸轉動。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"bone_arm":{"title":"活動骨端","shortName":"活動骨端","eng":"Moving bone","desc":"骨端可在允許平面內進行屈曲與伸展。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"oval_head":{"title":"橢圓關節面","shortName":"橢圓關節面","eng":"Oval condyle","desc":"橢圓凸面與對應凹面接觸。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"two_axes":{"title":"雙軸運動","shortName":"雙軸運動","eng":"Biaxial movement","desc":"允許兩個主要平面上的角度變化，可組合成環轉。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"pivot_rod":{"title":"骨性旋轉軸","shortName":"骨性旋轉軸","eng":"Pivot rod","desc":"在環狀韌帶或骨性環內旋轉。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"rotational":{"title":"旋轉方向","shortName":"旋轉方向","eng":"Rotation axis","desc":"允許旋前旋後或頭部左右轉等主要旋轉動作。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"saddle_surface":{"title":"鞍狀關節面","shortName":"鞍狀關節面","eng":"Saddle surfaces","desc":"互相垂直方向呈凹凸形態，提高穩定並允許雙軸活動。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"opposition":{"title":"拇指對掌方向","shortName":"拇指對掌方向","eng":"Opposition","desc":"第一掌腕關節配合肌肉，可產生對掌等複合運動。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"ball_head":{"title":"球形關節頭","shortName":"球形關節頭","eng":"Spherical head","desc":"球狀關節面與關節窩配合。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"socket":{"title":"關節窩","shortName":"關節窩","eng":"Socket","desc":"承接球形骨頭，肩盂較淺而髖臼較深。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]},"multi_axis":{"title":"多軸運動","shortName":"多軸運動","eng":"Multiaxial movement","desc":"可在多個平面與軸上活動。","ot":"分析關節型式可預測關節活動度與副木限制的方向。","tags":["D-續. 六種滑膜關節型式","第六章 關節"]}}},"ch6_motion":{"label":"D-續. 關節運動","goal":"理解角度運動、旋轉、環轉與特殊運動的方向及常用英文術語。","compare":"屈伸看關節角度變化；旋前、旋後是前臂橈尺骨相對旋轉，不等同腕關節屈伸。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","modes":{"flex":{"btn":"屈曲／伸展／過度伸展","title":"D-續. 關節運動｜屈伸","eng":"Flexion and Extension","desc":"屈曲通常減少關節兩骨前側角度（膝、足踝例外須依定義）；伸展增加角度或回到解剖姿勢，超過常態伸直範圍稱過度伸展。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","visual":"motion_hinge","keys":["flexion","extension","hyperextension"]},"abduct":{"btn":"外展／內收","title":"D-續. 關節運動｜外展與內收","eng":"Abduction and Adduction","desc":"外展一般指遠離身體正中線；內收指朝向正中線。手指以中指為軸、足趾以第二趾為參照，需注意例外。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","visual":"motion_abduct","keys":["abduction","adduction"]},"rotation":{"btn":"旋轉與環轉","title":"D-續. 關節運動｜內外旋與環轉","eng":"Rotation and Circumduction","desc":"內旋使肢體前側朝正中線轉，外旋相反；環轉是依序結合屈伸與外展內收，使遠端描畫近似圓錐的路徑。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","visual":"motion_rotation","keys":["medial_rotation","lateral_rotation","circumduction"]},"ankle":{"btn":"足背屈／足底屈／內外翻","title":"D-續. 關節運動｜踝足特殊動作","eng":"Ankle and Foot Movements","desc":"足背屈使腳背朝小腿前方靠近；足底屈為腳尖下壓。內翻使足底朝向內側，外翻使足底朝向外側；內外翻主要涉及足部多關節。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","visual":"motion_ankle","keys":["dorsi","plantar","inversion","eversion"]},"forearm":{"btn":"前臂旋前／旋後","title":"D-續. 關節運動｜旋前與旋後","eng":"Pronation and Supination","desc":"前臂旋後時橈尺骨近似平行、手掌朝前或朝上；旋前時橈骨相對尺骨交叉、手掌朝後或朝下。是橈尺關節的旋轉，不等於肩旋轉。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","visual":"motion_forearm","keys":["radius","ulna","pronation","supination"]},"special":{"btn":"前引後縮／上提下壓／對掌","title":"D-續. 關節運動｜其他特殊動作","eng":"Protraction, Retraction, Elevation, Depression, Opposition","desc":"前引與後縮指身體部位向前及向後移動，常用於肩胛骨、下顎；上提與下壓指垂直方向移動；拇指對掌使拇指指腹靠近其他手指指腹。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","visual":"motion_special","keys":["protraction","retraction","elevation","depression","opposition"]}},"structures":{"flexion":{"title":"屈曲","shortName":"屈曲","eng":"Flexion","desc":"例如肘部屈曲使前臂朝上臂靠近。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"extension":{"title":"伸展","shortName":"伸展","eng":"Extension","desc":"例如肘伸直回到解剖姿勢。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"hyperextension":{"title":"過度伸展","shortName":"過度伸展","eng":"Hyperextension","desc":"關節超過一般解剖伸直位置，幅度需依關節與個體評估。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"abduction":{"title":"外展","shortName":"外展","eng":"Abduction","desc":"例如肩關節使手臂由軀幹側向外抬起。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"adduction":{"title":"內收","shortName":"內收","eng":"Adduction","desc":"由外側位置朝身體中線收回。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"medial_rotation":{"title":"內旋","shortName":"內旋","eng":"Medial rotation","desc":"沿肢體長軸轉動，前側表面朝中線。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"lateral_rotation":{"title":"外旋","shortName":"外旋","eng":"Lateral rotation","desc":"沿肢體長軸轉動，前側表面遠離中線。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"circumduction":{"title":"環轉","shortName":"環轉","eng":"Circumduction","desc":"遠端作近似圓形運動，近端相對穩定，屬多方向組合動作。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"dorsi":{"title":"足背屈","shortName":"足背屈","eng":"Dorsiflexion","desc":"踝部腳背向小腿前側靠近，例如抬腳尖。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"plantar":{"title":"足底屈","shortName":"足底屈","eng":"Plantar flexion","desc":"腳尖向下，如踮腳尖。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"inversion":{"title":"內翻","shortName":"內翻","eng":"Inversion","desc":"足底面轉向內側，與踝內翻扭傷相關。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"eversion":{"title":"外翻","shortName":"外翻","eng":"Eversion","desc":"足底面轉向外側。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"radius":{"title":"橈骨","shortName":"橈骨","eng":"Radius","desc":"旋前時橈骨在尺骨前方交叉，旋後時較平行。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"ulna":{"title":"尺骨","shortName":"尺骨","eng":"Ulna","desc":"構成前臂內側軸，與橈骨共同參與旋前旋後。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"pronation":{"title":"旋前","shortName":"旋前","eng":"Pronation","desc":"掌心向下或向後的前臂旋轉。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"supination":{"title":"旋後","shortName":"旋後","eng":"Supination","desc":"掌心向上或向前的前臂旋轉。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"protraction":{"title":"前引","shortName":"前引","eng":"Protraction","desc":"肩胛骨、下顎等向前移動。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"retraction":{"title":"後縮","shortName":"後縮","eng":"Retraction","desc":"肩胛骨、下顎等向後移回。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"elevation":{"title":"上提","shortName":"上提","eng":"Elevation","desc":"肩帶往上靠近耳部的方向。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"depression":{"title":"下壓","shortName":"下壓","eng":"Depression","desc":"肩帶往下移動。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]},"opposition":{"title":"拇指對掌","shortName":"拇指對掌","eng":"Opposition","desc":"拇指旋轉與移動以接觸其他指腹，是重要的手部功能。","ot":"OT 在量測 ROM、設計伸展及功能訓練時需要精確區分關節方向。","tags":["D-續. 關節運動","第六章 關節"]}}},"ch6_body":{"label":"E. 人體的關節","goal":"定位代表性關節、辨識構造類型與主要運動；比較肩、髖的活動性及穩定性。","compare":"肩關節球窩較淺且活動大；髖關節髖臼深、負重穩定高。膝關節不是單純完全固定軸的鉸鏈。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","modes":{"atlas":{"btn":"寰枕／寰樞","title":"E. 人體關節｜頭頸部","eng":"Craniovertebral Joints","desc":"寰枕關節以點頭為主，屬髁狀關節；正中寰樞關節以齒突為軸，主要容許頭部左右旋轉。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","visual":"body_neck","keys":["occiput","atlas","axis_dens"]},"shoulder":{"btn":"肩關節與周邊支持","title":"E. 人體關節｜肩關節","eng":"Glenohumeral Joint","desc":"肱骨頭與肩胛骨關節盂形成球窩關節；較淺關節盂、關節唇、關節囊及旋轉肌袖協助兼顧活動與穩定。滑囊及肱二頭肌長頭肌腱有助於理解肩部減摩擦結構。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","visual":"body_shoulder","keys":["humeral_head","glenoid","labrum","rotator_cuff","subacromial_bursa"]},"elbow":{"btn":"肘與上橈尺關節","title":"E. 人體關節｜肘部","eng":"Elbow and Proximal Radioulnar","desc":"肱尺關節主要是屈伸鉸鏈關節；上橈尺關節是旋前旋後的車軸關節，橈骨頭受環狀韌帶穩定。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","visual":"body_elbow","keys":["humerus","ulna","radial_head"]},"wrist":{"btn":"腕與拇指掌腕","title":"E. 人體關節｜腕部與手","eng":"Wrist and Thumb","desc":"橈腕關節是橢圓關節，可屈伸及橈尺偏；第一掌腕關節屬鞍狀關節，提供拇指對掌所需的多方向活動。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","visual":"body_wrist","keys":["radius","carpals","thumb_cmc"]},"hip":{"btn":"髖關節","title":"E. 人體關節｜髖關節","eng":"Hip Joint","desc":"股骨頭與骨盆髖臼構成球窩關節；較深的髖臼及強韌關節囊提供負重穩定，允許屈伸、外展內收及旋轉。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","visual":"body_hip","keys":["acetabulum","femoral_head","iliofemoral"]},"knee":{"btn":"膝關節","title":"E. 人體關節｜膝關節","eng":"Knee Joint","desc":"膝關節是改良鉸鏈關節，主要屈伸、屈曲時允許少量旋轉；半月板改善吻合與負荷分散，十字韌帶協助限制脛骨與股骨的前後錯位。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","visual":"body_knee","keys":["femur","meniscus","tibia","cruciate"]},"ankle":{"btn":"踝部與遠端脛腓","title":"E. 人體關節｜踝部","eng":"Talocrural and Tibiofibular","desc":"踝關節（距小腿關節）由脛腓骨與距骨構成，以足背屈、足底屈為主要動作；遠端脛腓連結屬纖維性韌帶連結，維持踝穴穩定。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","visual":"body_ankle","keys":["tibia","fibula","talus","tibfib"]}},"structures":{"occiput":{"title":"枕骨髁","shortName":"枕骨髁","eng":"Occipital condyle","desc":"與寰椎上關節面形成寰枕關節。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"atlas":{"title":"寰椎（C1）","shortName":"寰椎（C1）","eng":"Atlas","desc":"第一頸椎，承接頭顱重量並參與點頭運動。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"axis_dens":{"title":"樞椎齒突（C2）","shortName":"樞椎齒突（C2）","eng":"Dens of axis","desc":"形成寰樞關節轉動軸。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"humeral_head":{"title":"肱骨頭","shortName":"肱骨頭","eng":"Humeral head","desc":"肱骨球形骨端，可進行多軸活動。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"glenoid":{"title":"關節盂","shortName":"關節盂","eng":"Glenoid cavity","desc":"肩胛骨外側淺凹關節面。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"labrum":{"title":"關節唇","shortName":"關節唇","eng":"Glenoid labrum","desc":"纖維軟骨環增加關節盂深度與接觸面積。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"rotator_cuff":{"title":"旋轉肌袖","shortName":"旋轉肌袖","eng":"Rotator cuff","desc":"肌肉與肌腱提供肩關節動態穩定。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"subacromial_bursa":{"title":"肩峰下滑囊","shortName":"肩峰下滑囊","eng":"Subacromial bursa","desc":"位於肩峰與肌腱等構造之間，有助減少滑動摩擦。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"humerus":{"title":"肱骨遠端","shortName":"肱骨遠端","eng":"Distal humerus","desc":"與尺骨及橈骨構成肘部關節系統。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"ulna":{"title":"尺骨滑車切跡","shortName":"尺骨滑車切跡","eng":"Trochlear notch","desc":"與肱骨滑車配合，主要進行屈伸。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"radial_head":{"title":"橈骨頭","shortName":"橈骨頭","eng":"Radial head","desc":"與尺骨橈切跡及環狀韌帶構成近端橈尺車軸關節。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"radius":{"title":"遠端橈骨","shortName":"遠端橈骨","eng":"Distal radius","desc":"橈腕關節近端主要關節面之一。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"carpals":{"title":"近端腕骨","shortName":"近端腕骨","eng":"Proximal carpal bones","desc":"舟狀、月狀等腕骨參與橈腕關節及腕內運動。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"thumb_cmc":{"title":"第一掌腕關節","shortName":"第一掌腕關節","eng":"First carpometacarpal","desc":"大多角骨與第一掌骨之間的鞍狀關節，對掌關鍵。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"acetabulum":{"title":"髖臼","shortName":"髖臼","eng":"Acetabulum","desc":"位於髖骨外側的深凹窩，與股骨頭相對。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"femoral_head":{"title":"股骨頭","shortName":"股骨頭","eng":"Femoral head","desc":"球形關節面，承受來自軀幹的負重。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"iliofemoral":{"title":"髂股韌帶","shortName":"髂股韌帶","eng":"Iliofemoral ligament","desc":"髖關節囊前方強韌支持構造，有助限制過度伸展。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"femur":{"title":"股骨髁","shortName":"股骨髁","eng":"Femoral condyles","desc":"股骨下端兩髁與脛骨平台接觸。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"meniscus":{"title":"半月板","shortName":"半月板","eng":"Meniscus","desc":"內、外側半月板由纖維軟骨構成，有助負荷分散與穩定。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"tibia":{"title":"脛骨平台","shortName":"脛骨平台","eng":"Tibial plateau","desc":"承接股骨髁的上端承重平台。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"cruciate":{"title":"十字韌帶","shortName":"十字韌帶","eng":"Cruciate ligaments","desc":"前後十字韌帶限制脛股關節過度前後位移。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"fibula":{"title":"腓骨外踝","shortName":"腓骨外踝","eng":"Lateral malleolus","desc":"形成踝穴外側，協助限制過度偏移。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"talus":{"title":"距骨","shortName":"距骨","eng":"Talus","desc":"距骨滑車面與脛腓骨組成踝關節。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]},"tibfib":{"title":"遠端脛腓韌帶","shortName":"遠端脛腓韌帶","eng":"Distal tibiofibular syndesmosis","desc":"韌帶連結脛腓骨遠端，維持踝穴位置。","ot":"OT 關節評估需同時考量活動度、疼痛、穩定度、感覺與日常生活功能。","tags":["E. 人體的關節","第六章 關節"]}}}};
+function v6Rect(x,y,w,h,fill='#24415b',r=12,stroke='#66849f',sw=2){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`}
+function v6Path(d,fill='#e4cda6',stroke='#9f835e',sw=3){return `<path d="${d}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"/>`}
+function v6Circle(x,y,r,fill='#e4cda6',stroke='#9f835e',sw=3){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`}
+function v6Line(x1,y1,x2,y2,stroke='#fbbf24',sw=5,dash=''){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" ${dash?`stroke-dasharray="${dash}"`:''}/>`}
+function v6Text(x,y,txt,size=16,col='#dbeafe',anchor='middle'){return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${col}" font-weight="700" paint-order="stroke" stroke="#102033" stroke-width="2" stroke-linejoin="round">${v4Esc(txt)}</text>`}
+function v6Arc(cx,cy,r,a,b,c='#fb7185'){let q=a*Math.PI/180,t=b*Math.PI/180;let x1=cx+r*Math.cos(q),y1=cy+r*Math.sin(q),x2=cx+r*Math.cos(t),y2=cy+r*Math.sin(t);return `<path d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 ${Math.abs(b-a)>180?1:0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round" marker-end="url(#v6arrow)"/>`}
+function v6SceneGeometry(vis,mode,keys){
+ let s='',p={};const bone='#efd9b3',edge='#ae926d',cart='#46cbbd',fluid='#38bdf8',lig='#f5b56b',purple='#ba98ff';
+ function point(key,x,y){p[key]=[x,y]}
+ // 依照片的章節概念重新製作圖形；背景圖形為定位示意，彩色編號是可點選的構造熱區。
+ if(['classfunc','classstruct','axes'].includes(vis)){
+  const captions=vis==='classfunc'?['無運動','少量運動','自由運動']:vis==='classstruct'?['纖維連結','軟骨連結','有滑膜腔']:['單軸','雙軸','多軸'];
+  keys.forEach((key,i)=>{let x=66+i*154;s+=v6Rect(x,134,130,223,i===0?'#294057':i===1?'#303a60':'#214b5b',13);
+    s+=v6Path(`M${x+18} 179 L${x+56} 179 L${x+56} 224 L${x+18} 224Z`,bone,edge,2)+v6Path(`M${x+75} 179 L${x+111} 179 L${x+111} 224 L${x+75} 224Z`,bone,edge,2);
+    if(vis==='classfunc')s+=i===0?v6Line(x+64,177,x+64,227,'#fda4af',10):i===1?v6Arc(x+65,214,29,230,300,'#fbbf24'):v6Arc(x+65,214,39,225,340,'#4ade80');
+    else if(vis==='classstruct')s+=i===0?v6Line(x+62,174,x+62,235,lig,11,'4 5'):i===1?v6Rect(x+57,174,18,65,cart,4):v6Rect(x+57,177,18,58,fluid,7);
+    else s+=v6Arc(x+65,215,32,207,333, i===0?'#fbbf24':'#4ade80');
+    s+=v6Text(x+65,304,captions[i],17);point(key,x+65,260);
+  });
+ }else if(vis==='suture'){
+  s+=v6Path('M82 155 H227 l18 20 -18 18 18 19 -18 17 18 19 -18 17 18 20 -18 18 18 22 -18 21 H82Z','#efcf9e',edge,3);
+  s+=v6Path('M246 155 H452 V363 H246 l18 -21 -18 -22 18 -18 -18 -20 18 -17 -18 -19 18 -19 -18 -20 18 -18Z','#dec29c',edge,3);
+  s+=v6Path('M245 164 l0 205','none','#fbbf24',4);point('bone_left',144,249);point('suture_line',244,248);point('bone_right',372,249);
+ }else if(vis==='syndesmosis'){
+  s+=v6Path('M170 126 Q151 218 172 398 L240 398 Q246 290 235 126Z',bone,edge,4);
+  s+=v6Path('M343 126 Q329 227 345 398 L392 398 Q405 284 395 126Z',bone,edge,4);
+  for(let i=0;i<7;i++)s+=v6Line(245,191+i*22,341,202+i*22,lig,5);
+  s+=v6Path('M237 324 Q285 347 344 327','none','#fbbf24',12);point('tibia',190,248);point('fibula',369,248);point('synd_lig',285,330);
+ }else if(vis==='tooth'){
+  s+=v6Path('M96 270 L194 270 L216 396 L340 396 L358 270 L464 270 L464 426 L96 426Z','#c99a83','#f7c7b7',3);
+  s+=v6Path('M222 150 Q264 114 316 150 Q340 172 321 223 L309 316 Q282 382 252 316 L235 224 Q214 189 222 150Z','#f2ead7','#a6917c',3);
+  s+=v6Path('M222 215 L251 324 Q281 374 305 324 L323 215','none','#d99bb1',9);
+  point('tooth',281,187);point('periodontal',320,296);point('alveolus',179,352);
+ }else if(vis==='growthplate'){
+  s+=v6Path('M198 115 Q276 74 359 115 L375 192 L359 210 L193 210 L174 192Z',bone,edge,4);
+  s+=v6Path('M206 210 H346 V230 H206Z',cart,'#99f6e4',3);
+  s+=v6Path('M207 230 H345 L355 409 H195Z',bone,edge,4);
+  for(let i=0;i<7;i++)s+=v6Circle(213+i*21,221,3,'#065f56','none',0);
+  point('epiphysis',285,153);point('growth_plate',280,220);point('diaphysis',281,349);
+ }else if(vis==='disc'){
+  s+=v6Path('M168 112 H387 L407 180 L380 219 H172 L145 179Z',bone,edge,4);
+  s+=v6Path('M171 243 Q272 216 382 243 L389 291 Q274 316 164 291Z','#c084fc','#e9d5ff',4);
+  s+=v6Circle(275,267,24,'#ffc1e8','#f472b6',2);
+  s+=v6Path('M171 307 H380 L408 350 L387 418 H168 L146 354Z',bone,edge,4);
+  point('vertebra_upper',275,166);point('disc',274,264);point('vertebra_lower',279,359);
+ }else if(['synovial','bursa','stability'].includes(vis)){
+  s+=v6Path('M195 95 H348 L360 222 Q309 266 201 228Z',bone,edge,4)+v6Path('M198 344 Q281 309 358 344 L366 436 H191Z',bone,edge,4);
+  s+=v6Path('M201 223 Q280 268 357 220','none',cart,13)+v6Path('M196 347 Q284 313 357 347','none',cart,13);
+  s+=v6Path('M165 157 Q138 270 164 400 M383 158 Q411 286 386 394','none', '#f6b86b',12);
+  s+=v6Path('M180 226 Q155 285 180 350 M373 220 Q396 278 370 354','none','#f472b6',7);
+  s+=v6Rect(202,282,151,19,'#0d5975',9,fluid,2);
+  if(vis==='synovial'){
+   point('bone_top',273,150);point('art_cart',220,235);point('cavity',280,286);point('syn_mem',381,282);point('capsule',158,278);point('bone_bottom',276,396);
+  }else if(vis==='bursa'){
+    s+=v6Path('M153 128 Q264 116 388 121','none','#f7a35d',16);
+    s+=v6Path('M175 146 Q287 162 380 144','none','#f472b6',13);
+    s+=v6Path('M179 162 Q271 176 375 157','none','#7dd3fc',9);
+    point('tendon',250,128);point('bursa',282,156);point('tendon_sheath',373,168);point('ligament',156,287);
+  }else{point('surface',273,238);point('ligament',386,293);point('muscle',269,152);s+=v6Path('M195 96 Q245 56 340 99','none','#fda4af',19);}
+ }else if(vis.startsWith('type_')){
+  s+=v6Rect(66,112,432,295,'#182f46',18,'#51738d',1.5);
+  if(vis==='type_plane'){
+   s+=v6Rect(150,254,245,62,bone,8);s+=v6Rect(172,170,217,65,bone,8);s+=v6Line(250,149,342,149,fluid,6);point('surface_1',286,206);point('glide',342,147);
+  }else if(vis==='type_hinge'){
+   s+=v6Path('M185 136 H266 V254 Q280 289 313 260 L348 237 L387 285 L339 328 Q277 361 239 309Z',bone,edge,3);
+   s+=v6Circle(287,260,33,'#91c8c5','#c3fff0',5)+v6Line(286,261,407,356,bone,29);s+=v6Arc(291,258,91,-135,-32);
+   point('hinge_axis',288,261);point('bone_arm',376,349);
+  }else if(vis==='type_ellipsoid'){
+   s+=v6Path('M173 313 Q273 376 378 313 L364 360 L186 360Z',bone,edge,3);s+=v6Path('M183 285 Q272 198 373 285 Q290 343 183 285Z','#7dd3fc','#fef3c7',5);s+=v6Arc(278,275,83,202,327);point('oval_head',279,272);point('two_axes',371,223);
+  }else if(vis==='type_pivot'){
+   s+=v6Rect(251,137,54,201,bone,26);s+=v6Path('M208 243 A83 43 0 1 1 364 243 A83 43 0 1 1 208 243Z','none',cart,12);s+=v6Arc(281,241,121,208,329);point('pivot_rod',281,222);point('rotational',372,186);
+  }else if(vis==='type_saddle'){
+   s+=v6Path('M138 275 Q216 196 289 275 Q372 351 438 272 L438 328 Q358 401 281 331 Q207 283 138 330Z',bone,edge,4);
+   s+=v6Path('M160 240 Q273 323 410 238 L410 204 Q281 283 160 202Z','#55c8cf','#a5f3fc',3);point('saddle_surface',282,263);point('opposition',380,172);s+=v6Arc(282,230,133,220,312);
+  }else{
+   s+=v6Path('M149 212 Q190 96 273 127 Q341 130 381 210 Q316 180 301 259 Q256 312 203 264Z',bone,edge,4);s+=v6Circle(295,239,69,cart,'#ccfbf1',4);s+=v6Circle(294,240,52,'#d7be95','#9f835e',3);s+=v6Path('M324 279 L388 392','none',bone,46);s+=v6Arc(295,237,112,216,337);point('ball_head',296,236);point('socket',199,230);point('multi_axis',385,187);
+  }
+ }else if(vis.startsWith('motion_')){
+  s+=v6Rect(60,106,454,309,'#173047',17,'#476780',1.3);
+  if(vis==='motion_hinge'||vis==='motion_abduct'||vis==='motion_rotation'){
+    s+=v6Circle(253,189,39,'#d7bd91','#fef3c7');s+=v6Line(253,193,262,302,bone,33);s+=v6Line(255,197,368,286,cart,27);
+    s+=v6Line(257,195,256,98,'#a9b6c8',6,'5 8');s+=v6Arc(254,197,116,-45,55);if(vis==='motion_hinge'){
+      point('flexion',377,283);point('extension',255,102);point('hyperextension',188,150);
+    }else if(vis==='motion_abduct'){point('abduction',374,285);point('adduction',261,287);}
+    else{point('medial_rotation',207,228);point('lateral_rotation',379,203);point('circumduction',273,102);}
+  }else if(vis==='motion_ankle'){
+    s+=v6Line(235,133,231,291,bone,48);s+=v6Path('M230 288 Q287 317 388 303 L390 334 L238 351Z',bone,edge,4);s+=v6Path('M235 295 Q286 263 360 251','none',cart,15);
+    s+=v6Arc(241,293,120,269,335);point('dorsi',358,249);point('plantar',383,320);point('inversion',169,334);point('eversion',313,366);
+  }else if(vis==='motion_forearm'){
+    s+=v6Circle(275,153,42,bone,edge);s+=v6Line(251,177,243,367,bone,21);s+=v6Line(303,177,315,368,cart,21);
+    s+=v6Path('M316 180 Q205 252 247 368','none', '#60a5fa',9);point('radius',312,229);point('ulna',247,269);point('pronation',223,334);point('supination',366,338);
+  }else{
+    s+=v6Circle(290,166,39,bone,edge);s+=v6Path('M245 213 H339 L357 321 H227Z','#638a9b','#98bed0',3);
+    s+=v6Line(246,226,169,276,cart,22)+v6Line(341,225,409,277,cart,22);
+    s+=v6Line(219,158,169,158,fluid,4)+v6Line(367,159,414,159,fluid,4);
+    point('protraction',418,155);point('retraction',164,157);point('elevation',299,102);point('depression',293,358);point('opposition',413,274);
+  }
+ }else if(vis.startsWith('body_')){
+  s+=v6Rect(61,104,450,329,'#162e43',18,'#41637e',1.6);
+  if(vis==='body_neck'){
+   s+=v6Path('M167 134 Q270 85 371 134 L343 194 L201 194Z',bone,edge,4);
+   s+=v6Path('M196 217 Q270 189 345 217 L335 254 Q270 273 206 254Z',bone,edge,4);
+   s+=v6Path('M188 295 Q270 259 351 295 L343 341 Q270 360 204 342Z',bone,edge,4);
+   s+=v6Rect(259,248,28,69,cart,10);point('occiput',272,144);point('atlas',270,233);point('axis_dens',272,299);
+  }else if(vis==='body_shoulder'){
+   s+=v6Path('M150 142 L280 184 L208 355Z',bone,edge,4);
+   s+=v6Path('M269 200 Q303 209 285 282','none','#7dd3fc',24);s+=v6Circle(334,248,62,bone,edge);s+=v6Path('M346 300 L392 401','none',bone,50);
+   s+=v6Path('M264 176 Q325 143 375 174','none','#f472b6',14);s+=v6Path('M232 141 Q298 112 372 124','none','#5de0e7',12);
+   point('glenoid',275,239);point('humeral_head',336,252);point('labrum',265,204);point('rotator_cuff',354,167);point('subacromial_bursa',284,131);
+  }else if(vis==='body_elbow'){
+   s+=v6Path('M236 110 H327 L335 253 Q288 292 240 252Z',bone,edge,4);
+   s+=v6Path('M222 269 Q250 239 281 279 L273 408 L221 408Z',bone,edge,4);
+   s+=v6Path('M314 278 Q339 251 363 280 L360 408 L311 408Z',bone,edge,4);
+   s+=v6Circle(335,279,20,cart,'#e0f2fe',4);point('humerus',283,210);point('ulna',246,340);point('radial_head',337,282);
+  }else if(vis==='body_wrist'){
+   s+=v6Path('M181 127 H286 L296 260 L180 264Z',bone,edge,4);
+   for(let i=0;i<6;i++)s+=v6Circle(210+(i%3)*38,288+Math.floor(i/3)*34,20,i%2?cart:'#c4b5fd','#a5f3fc',2);
+   s+=v6Path('M295 315 Q341 296 385 242','none',bone,32);
+   point('radius',236,185);point('carpals',267,294);point('thumb_cmc',354,273);
+  }else if(vis==='body_hip'){
+   s+=v6Path('M153 155 Q243 107 310 171 Q349 205 307 288 L218 322 L137 248Z',bone,edge,4);
+   s+=v6Circle(308,259,54,cart,'#5eead4',6);s+=v6Circle(316,262,40,bone,edge,3);
+   s+=v6Path('M330 298 L393 413','none',bone,47);s+=v6Path('M218 169 Q258 124 315 174','none','#f3b678',15);
+   point('acetabulum',273,258);point('femoral_head',321,253);point('iliofemoral',252,168);
+  }else if(vis==='body_knee'){
+   s+=v6Path('M200 113 H357 L367 245 Q308 279 272 252 Q224 267 193 240Z',bone,edge,4);
+   s+=v6Path('M215 325 Q276 306 355 327 L361 419 H201Z',bone,edge,4);
+   s+=v6Path('M215 279 Q253 264 277 288 Q325 260 355 279','none',cart,19);
+   s+=v6Path('M225 198 Q298 289 351 357 M345 195 Q277 290 227 360','none','#fda4af',8);
+   point('femur',288,175);point('meniscus',280,283);point('tibia',277,384);point('cruciate',288,322);
+  }else{
+   s+=v6Path('M199 117 H291 L300 289 L199 313Z',bone,edge,4);
+   s+=v6Path('M348 117 H390 L394 308 L350 304Z',bone,edge,4);
+   s+=v6Path('M207 324 Q273 290 359 324 L366 376 L206 377Z',cart,'#ccfbf1',4);
+   s+=v6Path('M291 257 Q318 278 359 261','none',lig,12);
+   point('tibia',238,251);point('fibula',371,241);point('talus',282,347);point('tibfib',324,261);
+  }
+ }
+ const missing=keys.filter(k=>!p[k]);if(missing.length){missing.forEach((k,i)=>{p[k]=[118+i*66,403]});}
+ return {drawing:s,points:p};
+}
+// 以角度滑桿演示活動骨端的相對運動；並非量測用 ROM 或生理角度上限。
+const V6_ANGLE_DEMOS={
+ type_hinge:[288,260,402,260],type_pivot:[281,243,352,243],type_ellipsoid:[278,275,385,275],type_saddle:[281,260,384,260],type_ball:[295,238,390,238],
+ motion_hinge:[254,197,367,197],motion_abduct:[254,197,362,197],motion_rotation:[254,197,365,197],motion_ankle:[240,294,366,294],motion_forearm:[281,255,375,255],
+ body_shoulder:[336,252,417,337],body_elbow:[286,260,393,260],body_hip:[317,265,403,329],body_knee:[278,295,375,350],body_ankle:[282,337,396,337]
+};
+function v6AngleOverlay(vis){
+ const a=V6_ANGLE_DEMOS[vis]; if(!a)return '';
+ const [cx,cy,x,y]=a;return `<g id="v6AngleDemo" transform="rotate(25 ${cx} ${cy})" style="pointer-events:none">
+   <line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e879f9" stroke-width="9" stroke-linecap="round" stroke-dasharray="13 8" opacity=".85"/>
+   <circle cx="${x}" cy="${y}" r="10" fill="#fde68a" stroke="#e879f9" stroke-width="3"/></g>`;
+}
+function v6SetAngle(value){
+ const svg=document.getElementById('v6AngleDemo');if(!svg||!v4ActiveRoute||v4ActiveRoute.engine!=='ch6')return;
+ const d=V6_CONTENT[activeNodeId]?.modes?.[activeSubMode];const a=V6_ANGLE_DEMOS[d?.visual];if(!a)return;
+ const degree=Number(value)||0;svg.setAttribute('transform',`rotate(${degree} ${a[0]} ${a[1]})`);
+ const label=document.getElementById('v6AngleValue');if(label)label.textContent=degree+'°';
+}
+function v6RenderScene(node,mode,imageMode=false){
+ const unit=V6_CONTENT[node],info=unit?.modes[mode];if(!info)return;
+ const svg=document.getElementById('mainSvg');svg.setAttribute('viewBox','0 0 800 500');
+ clearSvgLayers();document.getElementById('svgContainer').className='svg-wrapper theme-anatomical';
+ const keys=info.keys,geo=v6SceneGeometry(info.visual,mode,keys);
+ document.getElementById('layer-bg').innerHTML=v6Rect(11,12,778,475,'#14273c',16,'#41627e',2)+v6Rect(31,85,494,371,'#10253a',15,'#355873',1.4)+
+ '<defs><marker id="v6arrow" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6Z" fill="#fb7185"/></marker></defs>';
+ document.getElementById('layer-1').innerHTML=geo.drawing;
+ document.getElementById('layer-2').innerHTML=v6AngleOverlay(info.visual);
+ document.getElementById('layer-labels').innerHTML=v6Text(34,51,info.title,21,'#e0f2fe','start')+v6Text(278,475,'選擇圖中編號，或右側構造索引檢視詳解',13,'#cbd5e1');
+ let dots=''; keys.forEach((k,i)=>{const [x,y]=geo.points[k];dots+=`<g class="interactive-node v6-target" data-key="${k}" onclick="clickStructureKey('${k}')" role="button" tabindex="0" aria-label="${v4Esc(unit.structures[k].title)}">${v6Circle(x,y,19,'#075985','#7dd3fc',3)}${v6Text(x,y+6,String(i+1),17,'#ffffff')}</g>`;});
+ document.getElementById('layer-3').innerHTML=dots;
+ if(!imageMode){let legend=v6Rect(540,85,239,370,'#20354b',13,'#50718e',1.6)+v6Text(656,118,'本模式構造索引',18,'#f8fafc');
+  const h=Math.min(49,301/keys.length);keys.forEach((key,i)=>{const y=133+i*h;legend+=`<g class="interactive-node" data-key="${key}" onclick="clickStructureKey('${key}')">${v6Rect(550,y,215,h-5,i%2?'#2c405a':'#30465f',7,'#587492',0.8)}${v6Circle(568,y+(h-5)/2,12,'#075985','#7dd3fc',2)}${v6Text(568,y+(h-5)/2+5,String(i+1),13,'#fff')}${v6Text(588,y+(h-5)/2+5,unit.structures[key].shortName,15,'#f0f9ff','start')}</g>`;});
+  document.getElementById('layer-4').innerHTML=legend;
+ }
+ document.getElementById('layerControlsBar').innerHTML=`<label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('layer-labels',this.checked)"> 圖解標示</label><label class="layer-toggle"><input type="checkbox" checked onchange="toggleLayer('layer-4',this.checked)"> 構造索引</label><span style="color:#cbd5e1;font-size:.8rem">◉ 點選藍色編號，可連動右側詳解</span>`;
+ if(!imageMode&&V6_ANGLE_DEMOS[info.visual]){
+  document.getElementById('layerControlsBar').innerHTML+=`<label class="v6-angle-control">活動角度示意 <input type="range" min="0" max="80" step="5" value="25" oninput="v6SetAngle(this.value)" aria-label="關節活動角度示意"><strong id="v6AngleValue">25°</strong></label><span class="v6-angle-note">示意動作角度，非臨床正常 ROM</span>`;
+ }
+ if(imageMode)document.getElementById('layer-4').innerHTML='';
+ v4AnnotateSvgAccessibility();
+}
+for(const [id,u] of Object.entries(V6_CONTENT)){
+ const keys=Object.keys(u.modes);V4_ROUTES[id]={engine:'ch6',modes:keys,start:keys[0],structures:u.structures,theme:'theme-anatomical'};
+}
+/* 第六章原創學後測驗：四選一，並具交卷詳解與圖像辨識。 */
+V4_QUIZ_BANKS.ch6=[];
+function v6Q(related,q,opts,ans,exp){V4_QUIZ_BANKS.ch6.push({related,q,opts,ans,exp});}
+v6Q('ch6_classification','下列何者是依「功能」分類的關節類型？',['纖維關節','軟骨關節','微動關節','滑膜關節'],2,'功能分類依活動程度為不動、微動、可動；纖維、軟骨、滑膜為構造分類。');
+v6Q('ch6_classification','所有滑膜關節依功能分類均屬何種關節？',['不動關節','可動關節','微動關節','骨性癒合'],1,'滑膜關節具有關節腔，功能上屬可動關節（diarthroses），但不同關節仍有活動範圍差異。');
+v6Q('ch6_classification','下列何者為雙軸關節的典型例子？',['肘肱尺關節','寰樞車軸關節','橈腕橢圓關節','顱骨骨縫'],2,'橈腕關節主要允許屈伸與橈尺偏，屬雙軸型式。');
+v6Q('ch6_classification','功能性分類與構造性分類的關係何者正確？',['纖維關節全部都為可動關節','軟骨關節全部具有關節腔','不動關節必定是滑膜關節','纖維與軟骨關節可依部位呈不動或微動'],3,'構造分類與功能分類不是逐項對應；纖維及軟骨關節可為不動或微動。');
+v6Q('ch6_fibrous','顱骨骨縫主要屬於哪一種構造性關節？',['纖維關節','軟骨關節','滑膜關節','球窩關節'],0,'骨縫由緻密纖維結締組織連接，是纖維關節。');
+v6Q('ch6_fibrous','遠端脛腓骨之間主要是哪一種連結？',['嵌合關節','韌帶連結（syndesmosis）','球窩關節','軟骨結合'],1,'遠端脛腓骨以韌帶維持踝穴位置，屬纖維性韌帶連結。');
+v6Q('ch6_fibrous','牙根與齒槽骨之間的纖維關節稱為？',['骨縫','聯合','嵌合關節','滑動關節'],2,'牙根在齒槽骨中由牙周韌帶固定，稱嵌合關節（gomphosis）。');
+v6Q('ch6_fibrous','關於韌帶連結的敘述，何者錯誤？',['可由骨間膜形成','可能允許微小運動','由緻密結締組織提供穩定','必然具有滑液充填的關節腔'],3,'韌帶連結屬纖維關節，不具典型滑膜關節腔。');
+v6Q('ch6_cartilage','典型骨骺生長板在結構上屬於何種關節？',['透明軟骨結合','纖維性骨縫','球窩關節','牙根嵌合'],0,'骨骺生長板以透明軟骨連接骨骺與骨幹側，在發育期屬暫時性軟骨結合。');
+v6Q('ch6_cartilage','椎體間有椎間盤的關節，構造上通常屬於？',['骨縫','聯合（symphysis）','車軸關節','嵌合關節'],1,'椎間盤的纖維軟骨連接相鄰椎體，屬聯合，可容許少量活動。');
+v6Q('ch6_cartilage','何者是軟骨結合（synchondrosis）的主要連結材料？',['彈性軟骨','緻密纖維韌帶','透明軟骨','滑液'],2,'軟骨結合以透明軟骨直接連結骨骼；聯合則以纖維軟骨墊為特色。');
+v6Q('ch6_synovial','滑膜關節與纖維關節最具代表性的構造區別為何？',['滑膜關節沒有血管','滑膜關節必無韌帶','滑膜關節表面都是纖維軟骨','滑膜關節具有真正關節腔'],3,'滑膜關節具有被關節囊圍住、含少量滑液的關節腔。');
+v6Q('ch6_synovial','滑膜關節的滑膜主要分布於何處？',['關節囊內側非關節軟骨表面','透明軟骨完整表面','骨髓腔內壁','骨膜最外表面'],0,'滑膜襯於關節囊內側的非軟骨部位；不覆蓋關節軟骨。');
+v6Q('ch6_synovial','滑液的主要功能不包括哪一項？',['降低關節表面摩擦','直接讓骨質進行主動收縮','協助關節軟骨營養交換','潤滑關節'],1,'滑液潤滑並有助無血管的關節軟骨營養；骨骼本身不會主動收縮。');
+v6Q('ch6_synovial','滑囊與腱鞘最直接的共同功能為何？',['紅骨髓造血','調節血鈣','減少組織滑動摩擦','提供骨骺生長'],2,'滑囊與腱鞘是減少肌腱、骨面及周邊組織摩擦的潤滑結構。');
+v6Q('ch6_synovial','關於滑膜關節穩定性的敘述，何者正確？',['僅由骨頭形狀決定','與韌帶完全無關','活動度越大穩定性一定越強','骨性吻合、韌帶及肌肉控制共同影響'],3,'關節吻合度、關節囊與韌帶張力以及跨關節肌群控制共同影響穩定。');
+v6Q('ch6_types','第一掌腕關節最典型的滑膜關節型式是？',['鞍狀關節','車軸關節','球窩關節','骨縫'],0,'大多角骨與第一掌骨形成鞍狀關節，提供拇指對掌所需的運動自由度。');
+v6Q('ch6_types','寰樞關節以齒突為軸進行左右轉頭，屬何種關節？',['屈戌關節','車軸關節','橢圓關節','聯合'],1,'寰樞關節的主要轉動軸為樞椎齒突，是典型車軸關節示例。');
+v6Q('ch6_types','肘部肱尺關節的主要滑膜關節型式為何？',['滑動關節','鞍狀關節','屈戌／鉸鏈關節','球窩關節'],2,'肱尺關節以屈曲與伸展為主要活動，屬單軸鉸鏈關節。');
+v6Q('ch6_types','下列哪一組都屬球窩關節？',['橈腕與掌指','上橈尺與寰樞','肘與指間','肩關節與髖關節'],3,'肱骨頭與關節盂、股骨頭與髖臼均構成球窩關節。');
+v6Q('ch6_types','橈腕關節通常歸類為哪一種滑膜關節？',['橢圓／髁狀關節','車軸關節','骨縫','韌帶連結'],0,'橈腕關節主要可屈伸及橈尺偏，屬雙軸橢圓關節。');
+v6Q('ch6_motion','前臂旋前（pronation）時，橈骨與尺骨的相對位置通常為何？',['始終完全平行','橈骨相對尺骨交叉','兩骨骨性融合','尺骨繞橈骨遠端完全反轉'],1,'旋前時橈骨跨過尺骨，手掌朝下或朝後；旋後時兩骨較平行。');
+v6Q('ch6_motion','腳背朝小腿前側靠近的動作稱為？',['足底屈','內翻','足背屈','外翻'],2,'足背屈是抬起前腳掌使腳背接近小腿前面的動作。');
+v6Q('ch6_motion','足底面轉向身體內側的動作稱為？',['外翻','背屈','旋後（前臂）','內翻'],3,'足內翻使足底面朝內側；外翻則朝外側。');
+v6Q('ch6_motion','上肢從身體側面往外抬起稱為？',['外展','內收','旋前','前引'],0,'肩外展使肢體遠離身體正中線，與肩內收相反。');
+v6Q('ch6_motion','拇指指腹移向小指指腹以完成抓握，稱為？',['足背屈','對掌','內翻','肩上提'],1,'拇指對掌結合第一掌腕關節的旋轉與移動，是重要的精細動作。');
+v6Q('ch6_body','下列哪一個關節主要進行旋前／旋後而非屈伸？',['肱尺關節','距小腿關節','上橈尺關節','指間關節'],2,'上橈尺關節為車軸型式，和遠端橈尺關節共同參與旋前旋後。');
+v6Q('ch6_body','相較肩關節，髖關節通常具有較高的骨性穩定性，主要因為？',['髖關節沒有關節囊','肩關節沒有關節軟骨','髖關節不能旋轉','髖臼較深、包覆股骨頭較多'],3,'髖臼對股骨頭的骨性覆蓋較高，搭配強韌關節囊支撐承重。');
+v6Q('ch6_body','膝關節半月板最重要的作用之一為？',['分散負荷並改善吻合','分泌所有滑液','形成骨髓腔','讓小腿完全不能旋轉'],0,'半月板是纖維軟骨，協助分散負荷及提高脛股關節吻合與穩定。');
+v6Q('ch6_body','肩關節旋轉肌袖最直接協助何種功能？',['形成紅骨髓','動態維持肱骨頭於關節盂中','將肩關節改成纖維關節','阻止所有肩關節活動'],1,'旋轉肌袖肌肉與肌腱提供動態穩定，協助肱骨頭維持與關節盂適當接觸。');
+V4_IMAGE_QUESTIONS.ch6=[
+ {scene:'ch6_classification',mode:'function',target:'free',prompt:'請點選「可動關節」。'},
+ {scene:'ch6_fibrous',mode:'suture',target:'suture_line',prompt:'請點選顱骨的「骨縫」。'},
+ {scene:'ch6_fibrous',mode:'syndesmosis',target:'synd_lig',prompt:'請點選遠端脛腓韌帶連結。'},
+ {scene:'ch6_fibrous',mode:'gomphosis',target:'periodontal',prompt:'請點選牙根周圍的「牙周韌帶」。'},
+ {scene:'ch6_cartilage',mode:'synchondrosis',target:'growth_plate',prompt:'請點選骨骺「生長板」。'},
+ {scene:'ch6_cartilage',mode:'symphysis',target:'disc',prompt:'請點選椎體間的「椎間盤」。'},
+ {scene:'ch6_synovial',mode:'structure',target:'cavity',prompt:'請點選關節腔（含滑液）。'},
+ {scene:'ch6_synovial',mode:'structure',target:'syn_mem',prompt:'請點選滑膜。'},
+ {scene:'ch6_types',mode:'ball',target:'ball_head',prompt:'請點選球窩關節的球形關節頭。'},
+ {scene:'ch6_motion',mode:'forearm',target:'radius',prompt:'請點選前臂「橈骨」。'},
+ {scene:'ch6_body',mode:'shoulder',target:'glenoid',prompt:'請點選肩胛骨「關節盂」。'},
+ {scene:'ch6_body',mode:'knee',target:'meniscus',prompt:'請點選膝關節「半月板」。'}
 ];
 
 function v4DefaultState(){return {version:4,notes:{},completed:{},history:[],wrong:{},lastNode:'ch1_definition'};}
@@ -4319,8 +4587,8 @@ function v4SanitizeState(val){
  const def=v4DefaultState(); if(!val||typeof val!=='object')return def;
  const notes={};for(const [k,v] of Object.entries(val.notes||{})){if(V4_NODES[k]&&typeof v==='string')notes[k]=v.slice(0,30000);}
  const completed={};for(const [k,v] of Object.entries(val.completed||{})){if(V4_IMPLEMENTED.includes(k)&&v===true)completed[k]=true;}
- const history=Array.isArray(val.history)?val.history.filter(x=>x&&['ch1','ch2','ch3','ch4','ch5'].includes(x.chapter)&&['practice','exam','image'].includes(x.mode)&&Number.isFinite(x.total)&&Number.isFinite(x.correct)&&x.total>0&&x.correct>=0&&x.correct<=x.total).slice(-300).map(x=>({chapter:x.chapter,mode:x.mode,total:x.total,correct:x.correct,time:String(x.time||'').slice(0,40),mistakes:Array.isArray(x.mistakes)?x.mistakes.map(String).slice(0,100):[]})):[];
- const wrong={};for(const [k,v] of Object.entries(val.wrong||{})){if(/^ch[12345]_(?:t|img)_\d+$/.test(k)&&v&&typeof v==='object')wrong[k]={count:Math.min(Math.max(Number(v.count)||0,0),10000),last:String(v.last||'').slice(0,40),related:V4_NODES[v.related]?v.related:'',question:String(v.question||'').slice(0,600)};}
+ const history=Array.isArray(val.history)?val.history.filter(x=>x&&['ch1','ch2','ch3','ch4','ch5','ch6'].includes(x.chapter)&&['practice','exam','image'].includes(x.mode)&&Number.isFinite(x.total)&&Number.isFinite(x.correct)&&x.total>0&&x.correct>=0&&x.correct<=x.total).slice(-300).map(x=>({chapter:x.chapter,mode:x.mode,total:x.total,correct:x.correct,time:String(x.time||'').slice(0,40),mistakes:Array.isArray(x.mistakes)?x.mistakes.map(String).slice(0,100):[]})):[];
+ const wrong={};for(const [k,v] of Object.entries(val.wrong||{})){if(/^ch[123456]_(?:t|img)_\d+$/.test(k)&&v&&typeof v==='object')wrong[k]={count:Math.min(Math.max(Number(v.count)||0,0),10000),last:String(v.last||'').slice(0,40),related:V4_NODES[v.related]?v.related:'',question:String(v.question||'').slice(0,600)};}
  return {version:4,notes,completed,history,wrong,lastNode:V4_NODES[val.lastNode]?val.lastNode:def.lastNode};
 }
 let v4State=v4ReadState();
@@ -4419,7 +4687,7 @@ function v4RenderRoute(nodeId,overrideMode){
  const route=V4_ROUTES[nodeId];if(!route)return;
  v4ActiveRoute=route;
  document.getElementById('svgContainer').className='svg-wrapper '+route.theme;
- const modes=route.engine==='ch5'?V5_CONTENT[nodeId].modes:route.engine==='ch4'?V43_CONTENT[nodeId].modes:route.engine==='ch3'?V42_CONTENT[nodeId].modes:route.engine==='ch2'?V41_CONTENT[nodeId].modes:route.engine==='definition'?v4DefinitionMode:route.engine==='ch1'?ch1Data[route.source].subModes:route.engine==='ct'?ctModes:epiModes;
+ const modes=route.engine==='ch6'?V6_CONTENT[nodeId].modes:route.engine==='ch5'?V5_CONTENT[nodeId].modes:route.engine==='ch4'?V43_CONTENT[nodeId].modes:route.engine==='ch3'?V42_CONTENT[nodeId].modes:route.engine==='ch2'?V41_CONTENT[nodeId].modes:route.engine==='definition'?v4DefinitionMode:route.engine==='ch1'?ch1Data[route.source].subModes:route.engine==='ct'?ctModes:epiModes;
  const bar=document.getElementById('subModeBar');
  bar.innerHTML='<div class="submode-title">📂 本節互動檢視模式</div>'+route.modes.map(k=>`<button class="sub-btn" id="subBtn-${k}" onclick="v4TriggerMode('${k}')">${v4Esc(modes[k].btn)}</button>`).join('');
  v4TriggerMode(overrideMode&&route.modes.includes(overrideMode)?overrideMode:route.start);
@@ -4430,7 +4698,8 @@ function v4TriggerMode(mode){
  activeSubMode=mode;
  document.querySelectorAll('#subModeBar .sub-btn').forEach(b=>b.classList.toggle('active',b.id==='subBtn-'+mode));
  let info;
- if(v4ActiveRoute.engine==='ch5'){info=V5_CONTENT[activeNodeId].modes[mode];v5RenderScene(activeNodeId,mode);}
+ if(v4ActiveRoute.engine==='ch6'){info=V6_CONTENT[activeNodeId].modes[mode];v6RenderScene(activeNodeId,mode);}
+ else if(v4ActiveRoute.engine==='ch5'){info=V5_CONTENT[activeNodeId].modes[mode];v5RenderScene(activeNodeId,mode);}
  else if(v4ActiveRoute.engine==='ch4'){info=V43_CONTENT[activeNodeId].modes[mode];v43DrawChapterScene(activeNodeId,mode);}
  else if(v4ActiveRoute.engine==='ch3'){info=V42_CONTENT[activeNodeId].modes[mode];v42RenderScene(activeNodeId,mode);}
  else if(v4ActiveRoute.engine==='ch2'){info=V41_CONTENT[activeNodeId].modes[mode];v41RenderCh2Scene(activeNodeId,mode);}
@@ -4451,16 +4720,17 @@ function v4TriggerMode(mode){
  document.getElementById('overviewTitle').innerHTML=info.title+` <span class="eng-sub">${v4Esc(info.eng||'')}</span>`;
  document.getElementById('overviewDesc').innerHTML=info.desc;
  if(v4ActiveRoute.engine==='ch2'){const [goal,compare]=V41_LEARNING_GOALS[activeNodeId]||[];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
+ if(v4ActiveRoute.engine==='ch6'){const {goal,compare}=V6_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  if(v4ActiveRoute.engine==='ch5'){const {goal,compare}=V5_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  if(v4ActiveRoute.engine==='ch4'){const {goal,compare}=V43_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  if(v4ActiveRoute.engine==='ch3'){const {goal,compare}=V42_CONTENT[activeNodeId];document.getElementById('overviewDesc').innerHTML+=`<div class="v41-learn"><strong>🎯 學習目標</strong><div>${v4Esc(goal)}</div></div><div class="v41-learn compare"><strong>📌 易混淆觀念</strong><div>${v4Esc(compare)}</div></div>`;}
  document.getElementById('overviewOT').innerHTML=info.ot;
  v44DisableUnmappedHotspots();
  const v42VisibleKeys=new Set(Array.from(document.querySelectorAll('#mainSvg .interactive-node[data-key]')).map(x=>x.dataset.key));
- const visibleStructures=['ch3','ch4','ch5'].includes(v4ActiveRoute.engine)?Object.fromEntries(Object.entries(v4ActiveRoute.structures).filter(([k])=>v42VisibleKeys.has(k))):v4ActiveRoute.structures;
+ const visibleStructures=['ch3','ch4','ch5','ch6'].includes(v4ActiveRoute.engine)?Object.fromEntries(Object.entries(v4ActiveRoute.structures).filter(([k])=>v42VisibleKeys.has(k))):v4ActiveRoute.structures;
  renderQuickIndexList(visibleStructures);
  const visible=Array.from(v42VisibleKeys).find(k=>v4ActiveRoute.structures[k]);
- const firstKey=['ch2','ch3','ch4','ch5'].includes(v4ActiveRoute.engine)?visible:Object.keys(v4ActiveRoute.structures)[0];
+ const firstKey=['ch2','ch3','ch4','ch5','ch6'].includes(v4ActiveRoute.engine)?visible:Object.keys(v4ActiveRoute.structures)[0];
  if(firstKey)selectStructureItem(v4ActiveRoute.structures[firstKey],firstKey);
  v4AnnotateSvgAccessibility();
  document.getElementById('sceneContext').textContent='點選構造或下方索引，圖形及解說將同步更新。';
@@ -4473,7 +4743,7 @@ function v4RenderDefinition(){
  const cards=[['anatomy',45,52,342,115,'#0369a1','解剖學 Anatomy','人體構造與位置關係'],['physiology',415,52,342,115,'#047857','生理學 Physiology','器官與身體如何運作'],['gross',50,218,205,168,'#1d4ed8','大體解剖學','肉眼可見的構造'],['microscopic',298,218,205,168,'#7c3aed','顯微解剖學','細胞學／組織學'],['developmental',546,218,205,168,'#b45309','發育解剖學','人體構造的發育']];
  cards.forEach(([key,x,y,w,h,color,name,sub])=>{
   bg.innerHTML+=`<g class="interactive-node" data-key="${key}" onclick="clickStructureKey('${key}')"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="17" fill="${color}" stroke="#e2e8f0" stroke-width="2"/></g>`;
-  addLabel(labels,x+16,y+47,name,true);addLabel(labels,x+16,y+77,sub,true);
+  addLabel(labels,x+16,y+(h>130?68:47),name,true);addLabel(labels,x+16,y+(h>130?110:77),sub,true);
  });
  bg.innerHTML+='<path d="M 215 176 L 215 207 M 215 196 L 222 205 M 215 196 L 208 205" fill="none" stroke="#7dd3fc" stroke-width="3"/>';
  addLabel(labels,55,452,'點選各領域，右側將呈現研究範疇與職能治療應用。',true);
@@ -4702,7 +4972,7 @@ function v4StartQuiz(mode){
  if(mode==='exam')items=v4Shuffle(items).map(x=>({...x,choices:v4Shuffle(x.choices)}));
  v4Quiz={chapter,mode,items,answers:{},finished:false};
  const title=mode==='practice'?'練習模式 · 每題即時回饋':'模擬測驗 · 交卷前不顯示正確答案';
- const html=v4ModeMenu()+`<div class="quiz-header-box"><div><h3 style="color:#fff">${title}</h3><p class="quiz-progress-line">${chapter==='ch1'?'第一章完整題庫 15 題':chapter==='ch2'?'第二章完整題庫 20 題':chapter==='ch3'?'第三章完整題庫 25 題':chapter==='ch4'?'第四章完整題庫 20 題':'第五章骨骼系統 40 題'}</p></div><div class="quiz-score-badge" id="quizScoreBoard">已作答 0/${items.length}</div></div>`+
+ const html=v4ModeMenu()+`<div class="quiz-header-box"><div><h3 style="color:#fff">${title}</h3><p class="quiz-progress-line">${chapter==='ch1'?'第一章完整題庫 15 題':chapter==='ch2'?'第二章完整題庫 20 題':chapter==='ch3'?'第三章完整題庫 25 題':chapter==='ch4'?'第四章完整題庫 20 題':chapter==='ch5'?'第五章骨骼系統 40 題':'第六章關節 30 題'}</p></div><div class="quiz-score-badge" id="quizScoreBoard">已作答 0/${items.length}</div></div>`+
  '<div id="v4QuizSummarySlot"></div>'+items.map((q,i)=>`<div class="q-card" id="qCard-${i}"><div class="q-title">${v4Esc(q.q)}</div><div class="q-options">${q.choices.map((opt,j)=>`<button class="q-opt" id="qOpt-${i}-${j}" onclick="v4AnswerQuiz(${i},${j})">${'ABCD'[j]}. ${v4Esc(opt.label)}</button>`).join('')}</div><div class="q-exp" id="qExp-${i}" style="display:none"><strong>💡 解說：</strong>${v4Esc(q.exp)}<button class="quiz-jump" onclick="v4JumpTo('${q.related}')">回到相關教材</button></div></div>`).join('')+
  `<div class="quiz-menu"><button class="quiz-finish" id="quizSubmitBtn" onclick="${mode==='exam'?'v4FinishQuiz()':'v4RestartQuiz()'}">${mode==='exam'?'📩 交卷並查看成績':'🔄 重新練習'}</button></div>`;
  document.getElementById('quizSectionContainer').innerHTML=html;
@@ -4763,7 +5033,8 @@ function v4RenderImageQuestion(){
  const q=s.bank[s.i],route=V4_ROUTES[q.scene];v4ActiveRoute=route;v4SelectedStructure=null;
  document.getElementById('svgContainer').className='svg-wrapper '+route.theme;
  resetZoom();
- if(route.engine==='ch5')v5RenderScene(q.scene,q.mode,true);
+ if(route.engine==='ch6')v6RenderScene(q.scene,q.mode,true);
+ else if(route.engine==='ch5')v5RenderScene(q.scene,q.mode,true);
  else if(route.engine==='ch4')v43DrawChapterScene(q.scene,q.mode,true);
  else if(route.engine==='ch2')v41RenderCh2Scene(q.scene,q.mode,true);
  else if(route.engine==='ch3')v42RenderScene(q.scene,q.mode,true);
@@ -4826,7 +5097,7 @@ function v4DashboardHtml(){
   return `<div class="dash-box"><h3>${V4_CHAPTER_NAMES[ch]}</h3><div>已完成 ${done} / ${ids.length} 小節</div><div class="dash-rail"><div style="width:${done/ids.length*100}%"></div></div><div class="dash-meta">已建置 ${available} 小節；其餘後續擴充</div><button class="dash-link" onclick="${available?`v4JumpTo('${ids.find(id=>V4_ROUTES[id])}')`:`v4NavigateChapter('${ch}')`}">${available?'繼續學習':'查看章節目錄'}</button></div>`;
  });
  const history=v4State.history.slice(-8).reverse();
- const hist=history.length?`<table class="dash-table"><thead><tr><th>日期</th><th>章節與模式</th><th>答對率</th></tr></thead><tbody>${history.map(h=>`<tr><td>${v4Esc(h.time.slice(0,10))}</td><td>${v4Esc(V4_CHAPTER_NAMES[h.chapter])}<div class="dash-meta">${h.mode==='exam'?'模擬':h.mode==='image'?'圖像':'練習'}</div></td><td>${Math.round(h.correct/h.total*100)}% (${h.correct}/${h.total})</td></tr>`).join('')}</tbody></table>`:'<p class="dash-empty">尚無測驗紀錄，可從第一至五章的學後測驗開始。</p>';
+ const hist=history.length?`<table class="dash-table"><thead><tr><th>日期</th><th>章節與模式</th><th>答對率</th></tr></thead><tbody>${history.map(h=>`<tr><td>${v4Esc(h.time.slice(0,10))}</td><td>${v4Esc(V4_CHAPTER_NAMES[h.chapter])}<div class="dash-meta">${h.mode==='exam'?'模擬':h.mode==='image'?'圖像':'練習'}</div></td><td>${Math.round(h.correct/h.total*100)}% (${h.correct}/${h.total})</td></tr>`).join('')}</tbody></table>`:'<p class="dash-empty">尚無測驗紀錄，可從第一至六章的學後測驗開始。</p>';
  const wrong=Object.entries(v4State.wrong).sort((a,b)=>b[1].count-a[1].count).slice(0,15);
  const wrongHtml=wrong.length?wrong.map(([key,x])=>`<div style="border-bottom:1px solid #334155;padding:8px 0"><strong style="color:#fbbf24">錯 ${x.count} 次</strong>　${v4Esc(x.question)}<div>${x.related&&V4_ROUTES[x.related]?`<button class="dash-link" onclick="v4JumpTo('${x.related}')">開啟相關互動教材</button>`:'<span class="dash-meta">教材待完成</span>'}</div></div>`).join(''):'<p class="dash-empty">尚無錯題紀錄。</p>';
  return `<div class="dash-box" style="margin-bottom:12px"><strong>📌 本機學習資料狀態</strong><div class="dash-meta">已記錄 ${Object.keys(v4State.notes).filter(k=>v4State.notes[k].trim()).length} 小節筆記、${v4State.history.length} 次測驗；目前資料儲存 ${v4StorageAvailable?'正常':'受限'}。</div><p class="dash-meta">建議在更換檔案位置或瀏覽器之前，先匯出 JSON 備份。</p></div><div class="dashboard-grid">${blocks.join('')}<div class="dash-box"><h3>最近測驗紀錄</h3>${hist}</div><div class="dash-box"><h3>錯題與重點複習</h3>${wrongHtml}</div></div>`;
@@ -4843,7 +5114,7 @@ function exportStudyBackup(){
   const bundle={schema:'ot-anatomy-study-v4',exportedAt:new Date().toISOString(),app:'新編解剖學：職能治療互動學習系統',study:v4State};
   const blob=new Blob([JSON.stringify(bundle,null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(blob),link=document.createElement('a');
-  link.href=url;link.download='新編解剖學_V5_學習備份_'+new Date().toISOString().slice(0,10)+'.json';
+  link.href=url;link.download='新編解剖學_V6_學習備份_'+new Date().toISOString().slice(0,10)+'.json';
   document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
   v4Toast('已產生 JSON 備份，請確認檔案儲存位置。');
  }catch(e){alert('備份匯出失敗：'+e.message);}
@@ -4909,6 +5180,10 @@ function v5ScheduleFontFit(){
 }
 function v5OptimizeSVGText(){
  const svg=document.getElementById('mainSvg');if(!svg)return;
+ // 細胞膜主動運輸圖解原本有兩組標籤相互靠得太近，微調第二組定位。
+ if(activeNodeId==='ch2_cell_membrane'&&activeSubMode==='active'){
+  svg.querySelectorAll('text').forEach(t=>{if(['胞外：Na⁺ ↑','胞內：K⁺ ↑'].includes(t.textContent.trim()))t.setAttribute('x','230');});
+ }
  const rects=[...svg.querySelectorAll('rect')].map(r=>({x:+r.getAttribute('x'),y:+r.getAttribute('y'),w:+r.getAttribute('width'),h:+r.getAttribute('height')}))
  .filter(r=>Number.isFinite(r.x+r.y+r.w+r.h)&&r.w>=50&&r.h>=22);
  [...svg.querySelectorAll('text')].forEach(el=>{
@@ -4919,7 +5194,7 @@ function v5OptimizeSVGText(){
    el.dataset.v5FontOriginal=String(base);
   }
   const base=Number(el.dataset.v5FontOriginal)||13;
-  const desired=Math.min(27,Math.max(16,base*1.30+1.5)*v5FontScale);
+  const desired=Math.min(38,Math.max(16,base*1.30+1.5)*v5FontScale);
   const anchor=el.getAttribute('text-anchor')||'start';
   let box={x:12,y:0,w:776,h:500};
   const candidates=rects.filter(r=>x>=r.x+2&&x<=r.x+r.w-2&&y>=r.y+8&&y<=r.y+r.h+4);
@@ -4932,6 +5207,23 @@ function v5OptimizeSVGText(){
   try{const len=el.getComputedTextLength();if(len>avail*.97)size=Math.max(11,desired*(avail*.95/len));}catch(e){}
   el.setAttribute('font-size',String(Math.round(size*10)/10));el.style.fontSize=(Math.round(size*10)/10)+'px';
  });
+ // 文字交疊時逐步縮至不碰撞，保護過去章節已放入的密集雙欄標籤。
+ const labels=[...svg.querySelectorAll('text')];
+ for(let pass=0;pass<8;pass++){
+  let changed=false;
+  for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){
+   const a=labels[i],b=labels[j];if(!a.textContent.trim()||!b.textContent.trim())continue;
+   const ra=a.getBBox(),rb=b.getBBox();
+   const ix=Math.max(0,Math.min(ra.x+ra.width,rb.x+rb.width)-Math.max(ra.x,rb.x));
+   const iy=Math.max(0,Math.min(ra.y+ra.height,rb.y+rb.height)-Math.max(ra.y,rb.y));
+   if(ix*iy<95||ix*iy/Math.min(ra.width*ra.height,rb.width*rb.height)<.16)continue;
+   let candidate=(parseFloat(a.style.fontSize)||16)>=(parseFloat(b.style.fontSize)||16)?a:b;
+   let f=parseFloat(candidate.style.fontSize)||16;
+   if(f<=11.2){candidate=candidate===a?b:a;f=parseFloat(candidate.style.fontSize)||16;}
+   if(f>11.2){f=Math.max(11.2,f*.88);candidate.style.fontSize=f+'px';candidate.setAttribute('font-size',String(f));changed=true;}
+  }
+  if(!changed)break;
+ }
 }
 
 // 統一初始化，避免舊版註冊兩次 DOMContentLoaded 而重複啟動。
